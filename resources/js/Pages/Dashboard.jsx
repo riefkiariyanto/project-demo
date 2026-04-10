@@ -6,7 +6,7 @@ export default function Dashboard() {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
+                    Anjayyyyy
                 </h2>
             }
         >
@@ -16,7 +16,11 @@ export default function Dashboard() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
+<<<<<<< HEAD
                             Yyyyyy
+=======
+                            ANJAY!
+>>>>>>> 42497836e8d73cd6c7e1a0a323c615d48f70d316
                         </div>
                     </div>
                 </div>
