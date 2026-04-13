@@ -30,16 +30,16 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         $request->authenticate();
-
         $request->session()->regenerate();
+        $user = auth()->user();
 
-        $user = $request->user();
-
-        if ($user->role === 'superadmin') {
-            return redirect('/superadmin/dashboard');
+        if ($user->hasRole('superadmin')) 
+        {
+            return redirect('/superadmin');
         }
-        if ($user->role === 'admin') {
-            return redirect('/admin/dashboard');
+        if ($user->hasRole('admin')) 
+        {
+            return redirect('/admin');
         }
         return redirect('/dashboard');
     }
