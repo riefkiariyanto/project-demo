@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-import { Head, Link } from '@inertiajs/react';
-import NavBar from '@/Components/Navbar';
-
-=======
 import { Head, Link } from "@inertiajs/react";
->>>>>>> 682bc13 (spatie role)
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {

@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class LoginRequest extends FormRequest
 {
@@ -39,19 +42,36 @@ class LoginRequest extends FormRequest
      * @throws ValidationException
      */
     public function authenticate(): void
-    {
-        $this->ensureIsNotRateLimited();
+        {
+            $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            $user = User::where('email', $this->email)->first();
 
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+            Log::warning('Login attempt', [
+                'email' => $this->email,
+                'ip' => $this->ip(),
+                    ]);
+
+            if (!$user) {
+                RateLimiter::hit($this->throttleKey(), 30);
+
+                throw ValidationException::withMessages([
+                    'email' => 'Email tidak terdaftar, silakan cek kembali.',
+                ]);
+            }
+
+            if (!Hash::check($this->password, $user->password)) {
+                RateLimiter::hit($this->throttleKey(), 30);
+
+                throw ValidationException::withMessages([
+                    'password' => 'Password salah.',
+                ]);
+            }
+
+            Auth::login($user, $this->boolean('remember'));
+
+            RateLimiter::clear($this->throttleKey());
         }
-
-        RateLimiter::clear($this->throttleKey());
-    }
 
     /**
      * Ensure the login request is not rate limited.
@@ -60,22 +80,37 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 2)) {
             return;
         }
-
         event(new Lockout($this));
-
         $seconds = RateLimiter::availableIn($this->throttleKey());
-
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+
+        'password' => "Terlalu banyak percobaan login. Coba lagi dalam $seconds detik.",
+        'seconds' => $seconds,
+
         ]);
     }
 
+    protected function hitBruteForce()
+    {
+        // tambah 1 attempt (delay 30 detik)
+        RateLimiter::hit($this->throttleKey(), 30);
+
+        $attempts = RateLimiter::attempts($this->throttleKey());
+
+        // 🚨 jika >= 12 → dianggap brute force
+        if ($attempts >= 12) {
+
+            Log::critical('🚨 BRUTE FORCE DETECTED', [
+                'email' => $this->email,
+                'ip' => $this->ip(),
+                'attempts' => $attempts,
+            ]);
+
+            RateLimiter::hit($this->throttleKey(), 300);
+        }}
     /**
      * Get the rate limiting throttle key for the request.
      */

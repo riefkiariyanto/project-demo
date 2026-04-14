@@ -3,17 +3,7 @@ import { Head } from "@inertiajs/react";
 
 export default function Dashboard() {
     return (
-        <AuthenticatedLayout
-<<<<<<< HEAD
-           
-=======
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dasbhoard
-                </h2>
-            }
->>>>>>> 682bc13 (spatie role)
-        >
+        <AuthenticatedLayout>
             <Head title="Dashboard" />
 
             <div className="py-12">
