@@ -1,84 +1,83 @@
-import React from "react";
+import { Link } from "@inertiajs/react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
 import {
-  Card,
-  Typography,
-  List,
-  ListItem,
-  ListItemPrefix,
-  ListItemSuffix,
-  Chip,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-} from "@material-tailwind/react";
-import {
-  PresentationChartBarIcon,
-  ShoppingBagIcon,
-  UserCircleIcon,
-  Cog6ToothIcon,
-  InboxIcon,
-  PowerIcon,
+    HomeIcon,
+    ShoppingCartIcon,
+    ChartBarIcon,
+    Cog6ToothIcon,
+    ArrowRightOnRectangleIcon,
+    Bars3Icon,
 } from "@heroicons/react/24/solid";
-import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
-export function Sidebar() {
-  const [open, setOpen] = React.useState(0);
+export default function Sidebar({ open, setOpen }) {
+    const menu = [
+        { name: "Dashboard", icon: HomeIcon },
+        { name: "Kasir", icon: ShoppingCartIcon },
+        { name: "Laporan", icon: ChartBarIcon },
+        { name: "Kelola Toko", icon: Cog6ToothIcon },
+    ];
 
-  const handleOpen = (value) => {
-    setOpen(open === value ? 0 : value);
-  }; // ✅ INI YANG KURANG
-
-  return (
-    <Card className="h-[calc(100vh-2rem)] w-full max-w-[15rem] p-4 shadow-xl shadow-blue-gray-900/5">
-     
-      <div className="mb-2 p-4">
-        <Typography variant="h5" color="blue-gray">
-          Dashboard
-        </Typography>
-      </div>
-
-      <List>
-        <Accordion
-          open={open === 1}
-          icon={
-            <ChevronDownIcon
-              strokeWidth={2.5}
-              className={`mx-auto h-4 w-4 transition-transform ${
-                open === 1 ? "rotate-180" : ""
-              }`}
-            />
-          }
+    return (
+        <div
+            className={`fixed top-0 left-0 h-full z-40 bg-gradient-to-b from-orange-400 to-orange-600 text-white p-4 transition-all duration-300 ${
+                open ? "w-64" : "w-20"
+            }`}
         >
-          <ListItem className="p-0" selected={open === 1}>
-            <AccordionHeader
-              onClick={() => handleOpen(1)}
-              className="border-b-0 p-3"
-            >
-              <ListItemPrefix>
-                <PresentationChartBarIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              <Typography className="mr-auto font-normal">
-                Dashboard
-              </Typography>
-            </AccordionHeader>
-          </ListItem>
+            {/* HEADER */}
+            <div className="flex items-center justify-between mb-6">
+                {open ? (
+                    <>
+                        <div className="flex items-center gap-2">
+                            <ApplicationLogo className="h-8 w-auto text-white" />
+                            <h1 className="font-bold text-lg">Warkop</h1>
+                        </div>
 
-          <AccordionBody className="py-1">
-            <List className="p-0">
-              <ListItem>Analytics</ListItem>
-              <ListItem>Reporting</ListItem>
-              <ListItem>Projects</ListItem>
-            </List>
-          </AccordionBody>
-        </Accordion>
+                        <button onClick={() => setOpen(false)}>
+                            <Bars3Icon className="h-6 w-6" />
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        onClick={() => setOpen(true)}
+                        className="w-full flex justify-center p-2 hover:bg-white/20 rounded"
+                    >
+                        <Bars3Icon className="h-6 w-6" />
+                    </button>
+                )}
+            </div>
 
-        <ListItem>
-          <ListItemPrefix>
-            <InboxIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Inbox
-        </ListItem>
-      </List>
-    </Card>
-  );
+            {/* MENU */}
+            <div className="space-y-3">
+                {menu.map((item, i) => (
+                    <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/20 cursor-pointer"
+                    >
+                        <item.icon className="h-5 w-5" />
+                        {open && <span>{item.name}</span>}
+                    </div>
+                ))}
+            </div>
+
+            {/* FOOTER */}
+            <div className="absolute bottom-4 w-full left-0 px-4 space-y-2">
+                <Link href={route("profile.edit")}>
+                    <div className="flex items-center gap-3 p-2 hover:bg-white/20 rounded">
+                        <Cog6ToothIcon className="h-5 w-5" />
+                        {open && "Setting"}
+                    </div>
+                </Link>
+
+                <Link
+                    href={route("logout")}
+                    method="post"
+                    as="button"
+                    className="flex items-center gap-3 p-2 hover:bg-white/20 rounded w-full text-left"
+                >
+                    <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                    {open && "Logout"}
+                </Link>
+            </div>
+        </div>
+    );
 }

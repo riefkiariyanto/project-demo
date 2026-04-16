@@ -2,7 +2,6 @@ import Checkbox from "@/Components/Checkbox";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { Mail, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -89,6 +88,22 @@ export default function Login({ status, canResetPassword }) {
 
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617]">
                 <div className="w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 md:grid md:grid-cols-2">
+                    <div className="hidden md:flex flex-col justify-center items-center bg-[#1e293b] text-center px-10 py-16">
+                        <h2 className="text-3xl font-bold text-indigo-400 mb-4">
+                            Welcome Back!
+                        </h2>
+                        <p className="text-gray-300 text-sm mb-6">
+                            Log in to access your account and manage your
+                            projects.
+                        </p>
+
+                        <Link
+                            href={route("register")}
+                            className="px-6 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+                        >
+                            Create an account
+                        </Link>
+                    </div>
                     <div className="px-8 py-10 bg-[#020617] text-white">
                         <h2 className="text-2xl font-bold mb-6 text-center">
                             Sign in to your account
@@ -210,24 +225,6 @@ export default function Login({ status, canResetPassword }) {
                                     : "LOG IN"}
                             </PrimaryButton>
                         </form>
-                    </div>
-
-                    {/* RIGHT */}
-                    <div className="hidden md:flex flex-col justify-center items-center bg-[#1e293b] text-center px-10 py-16">
-                        <h2 className="text-3xl font-bold text-indigo-400 mb-4">
-                            Welcome Back!
-                        </h2>
-                        <p className="text-gray-300 text-sm mb-6">
-                            Log in to access your account and manage your
-                            projects.
-                        </p>
-
-                        <Link
-                            href={route("register")}
-                            className="px-6 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
-                        >
-                            Create an account
-                        </Link>
                     </div>
                 </div>
             </div>
