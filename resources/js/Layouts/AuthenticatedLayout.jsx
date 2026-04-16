@@ -27,7 +27,7 @@ export default function AuthenticatedLayout({ header, children }) {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-200 to-orange-400">
+        <div className="min-h-screen bg-gradient-to-br from-orange-400 to-orange-200">
             {/* SIDEBAR */}
             <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
@@ -40,7 +40,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* TOP BAR (SEARCH + JAM) */}
                 <div className="px-6 py-4 flex items-center justify-between gap-4">
                     {/* SEARCH */}
-                    <div className="w-full max-w-md">
+                    <div className="flex-1">
                         <SearchBar onSearch={setSearch} />
                     </div>
 
@@ -67,14 +67,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
 
-                {/* HEADER (DI BAWAH SEARCH) */}
-                {header && (
-                    <div className="px-6">
-                        <div className="bg-white shadow rounded-xl px-6 py-4 mb-4">
-                            {header}
-                        </div>
-                    </div>
-                )}
+                {header && <div className="px-6">{header}</div>}
 
                 {/* MAIN */}
                 <main className="p-6">{children}</main>

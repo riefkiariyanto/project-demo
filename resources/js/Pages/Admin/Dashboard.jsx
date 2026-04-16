@@ -5,7 +5,7 @@ export default function Dashboard() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-3xl font-semibold leading-tight text-white">
                     Dasbhoard
                 </h2>
             }
