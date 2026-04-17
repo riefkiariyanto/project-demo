@@ -8,19 +8,34 @@ use Spatie\Permission\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-   public function run(): void
-{
-    // ROLE
-    Role::firstOrCreate(['name' => 'superadmin']);
-    Role::firstOrCreate(['name' => 'admin']);
-    Role::firstOrCreate(['name' => 'user']);
+    public function run(): void
+    {
+        // PERMISSION
+        $permissions = [
+            'view users',
+            'create users',
+            'delete users',
+        ];
 
-    // PERMISSION
-    Permission::firstOrCreate(['name' => 'view users']);
-    Permission::firstOrCreate(['name' => 'create users']);
-    Permission::firstOrCreate(['name' => 'delete users']);
-}
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // ROLE
+        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $user = Role::firstOrCreate(['name' => 'user']);
+
+        // ASSIGN PERMISSION
+        $superadmin->givePermissionTo(Permission::all());
+
+        $admin->givePermissionTo([
+            'view users',
+            'create users',
+        ]);
+
+        $user->givePermissionTo([
+            'view users',
+        ]);
+    }
 }

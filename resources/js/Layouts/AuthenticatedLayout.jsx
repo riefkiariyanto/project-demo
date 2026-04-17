@@ -6,8 +6,18 @@ import SearchBar from "@/Components/SearchBar";
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
     const [search, setSearch] = useState("");
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [time, setTime] = useState(new Date());
+    const [open, setOpen] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem("sidebar")) ?? true;
+        } catch {
+            return true;
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem("sidebar", JSON.stringify(open));
+    }, [open]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -29,12 +39,12 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-400 to-orange-200">
             {/* SIDEBAR */}
-            <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+            <Sidebar open={open} setOpen={setOpen} />
 
             {/* CONTENT WRAPPER */}
             <div
-                className={`min-h-screen transition-all duration-300 ${
-                    sidebarOpen ? "ml-64" : "ml-20"
+                className={`flex-1 transition-all duration-300 ${
+                    open ? "ml-60" : "ml-20"
                 }`}
             >
                 {/* TOP BAR (SEARCH + JAM) */}
@@ -45,7 +55,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     {/* JAM (GLASS EFFECT) */}
-                    <div className="backdrop-blur-md bg-white/20 border border-white/30 text-white px-5 py-2 rounded-full flex items-center gap-3 shadow-lg">
+                    <div className="backdrop-blur-md bg-white/20 border border-white/30 text-white px-5 py-2 rounded-lg flex items-center gap-3 shadow-lg">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"

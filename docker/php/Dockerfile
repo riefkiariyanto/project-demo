@@ -9,20 +9,14 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install \
     pdo pdo_mysql mbstring zip exif pcntl intl
 
-# OPcache (FAST MODE)
+# OPcache
 RUN docker-php-ext-install opcache
 
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
     echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/opcache.ini && \
     echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/opcache.ini
 
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
-
-# COPY ONLY WHEN BUILD (NOT LIVE SYNC)
-COPY . .
-
-RUN composer install --no-dev --optimize-autoloader
-
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache

@@ -3,15 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Faker\Guesser\Name;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $superadmin = User::create([
@@ -19,21 +14,20 @@ class UserSeeder extends Seeder
             'email' => '1@gmail.com',
             'password' => bcrypt('password')
         ]);
-        $superadmin -> assignRole('superadmin');
+        $superadmin->assignRole('superadmin');
 
         $admin = User::create([
             'name' => 'admin',
             'email' => '2@gmail.com',
             'password' => bcrypt('password')
         ]);
-        $admin -> assignRole('admin');
+        $admin->assignRole('admin');
 
-        
         $user = User::create([
             'name' => 'user',
             'email' => '3@gmail.com',
             'password' => bcrypt('password')
         ]);
-        $user -> assignRole('user');
+        $user->assignRole('user');
     }
 }
