@@ -42,7 +42,7 @@ export default function Sidebar({ open, setOpen }) {
         {
             name: "Kelola Toko",
             icon: Cog6ToothIcon,
-            link: "/toko",
+            link: "/kelolatoko",
             roles: ["superadmin"],
         },
     ];
