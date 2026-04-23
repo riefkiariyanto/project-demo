@@ -26,10 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/laporan', fn () => Inertia::render('Laporan'));
-});
-Route::middleware(['auth', 'role:superadmin|user'])->group(function () {
+Route::middleware(['auth', 'role:superadmin|user|admin'])->group(function () {
     Route::get('/kasir', fn () => Inertia::render('Kasir'));
 });
 Route::middleware(['auth', 'role:superadmin'])->group(function () {

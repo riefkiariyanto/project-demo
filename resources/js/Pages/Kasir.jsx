@@ -7,7 +7,6 @@ import Cart from "@/Components/Cart";
 export default function Kasir() {
     const [cart, setCart] = useState([]);
     const [openCart, setOpenCart] = useState(false);
-
     const handleAddToCart = (item) => {
         setCart((prev) => {
             const exist = prev.find((i) => i.name === item.name);

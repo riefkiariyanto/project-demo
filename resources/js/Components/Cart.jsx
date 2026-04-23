@@ -101,9 +101,9 @@ export default function Cart({ cart, open, setOpen, setCart }) {
     return (
         <div
             className={`
-                fixed top-0 right-0 h-full z-40
+                fixed top-0 right-0 h-full z-60
                 transition-all duration-300 ease-in-out
-                ${open ? "w-[220px] sm:w-[320px]" : "w-0"}
+                ${open ? "w-[180px] sm:w-[320px]" : "w-0"}
             `}
         >
 

@@ -44,7 +44,14 @@ export default function Menu({ onAdd, openCart }) {
     }, []);
 
     return (
-        <div className=" bg-white/30 backdrop-blur-xl rounded-2xl p-3 border border-white/30 max-h-[800px] flex flex-col">
+        <div className="
+                w-full
+                min-w-[280px]
+                bg-white/30 backdrop-blur-xl rounded-2xl p-3
+                border border-white/30
+                max-h-[800px]
+                flex flex-col
+            ">
             {/* HEADER */}
             <div className="flex px-6 justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-white">
