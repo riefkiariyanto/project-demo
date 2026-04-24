@@ -34,7 +34,7 @@ export default function AuthenticatedLayout({ header, children, openCart }) {
             <div className="flex-1 min-w-0 flex flex-col">
 
                 {/* SEARCH */}
-                <div className="px-4 pt-4">
+                <div className="px-4 pt-2">
                     <div
                         className={`transition-all duration-300 ${openCart ? "mr-[320px]" : "mr-0"
                             }`}

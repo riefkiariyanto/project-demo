@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:superadmin|user|admin'])->group(function () {
     Route::get('/kasir', fn () => Inertia::render('Kasir'));
 });
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
+Route::middleware(['auth', 'role:superadmin|admin'])->group(function () {
     Route::get('/kelolatoko', fn () => Inertia::render('KelolaToko'));
 });
 

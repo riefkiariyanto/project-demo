@@ -43,7 +43,7 @@ export default function Sidebar({ open, setOpen }) {
             name: "Kelola Toko",
             icon: Cog6ToothIcon,
             link: "/kelolatoko",
-            roles: ["superadmin"],
+            roles: ["superadmin", "admin"],
         },
     ];
 
@@ -94,8 +94,8 @@ export default function Sidebar({ open, setOpen }) {
                         <Link key={i} href={item.link}>
                             <div
                                 className={`relative group flex items-center rounded-lg cursor-pointer transition-all duration-300 ${open
-                                        ? "gap-3 px-3 py-4 justify-start"
-                                        : "justify-center p-3"
+                                    ? "gap-3 px-3 py-4 justify-start"
+                                    : "justify-center p-3"
                                     } ${isActive
                                         ? "bg-white text-orange-500 font-semibold"
                                         : "hover:bg-white/20"
@@ -104,8 +104,8 @@ export default function Sidebar({ open, setOpen }) {
                                 <item.icon className="h-5 w-5" />
                                 <span
                                     className={`whitespace-nowrap transition-all duration-300 ${open
-                                            ? "opacity-100 ml-1"
-                                            : "opacity-0 w-0 overflow-hidden"
+                                        ? "opacity-100 ml-1"
+                                        : "opacity-0 w-0 overflow-hidden"
                                         }`}
                                 >
                                     {item.name}
