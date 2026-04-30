@@ -1,27 +1,23 @@
-import { Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useCallback } from 'react';
 
 export default function LogoutButton({ 
     children, 
     className = "",
-    as = "button",
     ...props 
 }) {
     const handleLogout = useCallback((e) => {
-        // Let Inertia handle the post request with CSRF token
-        // This ensures proper session handling
+        e.preventDefault();
+        router.post(route('logout'));
     }, []);
 
     return (
-        <Link
-            method="post"
-            href={route('logout')}
-            as={as}
-            className={className}
+        <button
             onClick={handleLogout}
+            className={className}
             {...props}
         >
             {children}
-        </Link>
+        </button>
     );
 }

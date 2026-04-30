@@ -12,59 +12,61 @@ use Inertia\Inertia;
 
 class KelolaTokoController extends Controller
 {
-    public function index()
+   public function index()
 {
     $user = auth()->user();
+    $isSuperadmin = $user->hasRole('superadmin');
 
-    $products = Product::with([
-        'category',
-        'recipe.items.material'
-    ])
-        ->when($user->hasRole('admin'), function ($query) use ($user) {
-            $query->where('store_id', $user->store_id);
-        })
+    $products = Product::with(['category', 'recipe.items.material'])
+        ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $user->store_id))
         ->latest()
         ->get();
 
-    $materials = Material::when($user->hasRole('admin'), function ($query) use ($user) {
-        $query->where('store_id', $user->store_id);
-    })
+    $materials = Material::
+        when(!$isSuperadmin, fn($q) => $q->where('store_id', $user->store_id))
         ->latest()
         ->get();
 
     $users = User::with('roles')
-        ->when($user->hasRole('admin'), function ($query) use ($user) {
-            $query->where('store_id', $user->store_id);
-        })
+        ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $user->store_id))
         ->get();
 
     return Inertia::render('KelolaToko', [
-        'products' => $products,
+        'products'   => $products,
         'categories' => Category::all(),
-        'materials' => $materials,
-        'users' => $users,
+        'materials'  => $materials,
+        'users'      => $users,
     ]);
 }
 
-    public function storeUser(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role' => 'required|in:superadmin,admin,user',
-        ]);
+public function storeUser(Request $request)
+{
+    $authUser = auth()->user();
+    $isSuperadmin = $authUser->hasRole('superadmin');
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+    $validated = $request->validate([
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8',
+        'role'     => 'required|in:superadmin,admin,user',
+        // superadmin bisa pilih store, admin otomatis store sendiri
+        'store_id' => $isSuperadmin ? 'nullable|exists:stores,id' : 'nullable',
+    ]);
 
-        $user->assignRole($validated['role']);
+    $user = User::create([
+        'name'     => $validated['name'],
+        'email'    => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        // 🔥 admin buat user → otomatis store yang sama
+        'store_id' => $isSuperadmin
+            ? ($validated['store_id'] ?? null)
+            : $authUser->store_id,
+    ]);
 
-        return redirect()->route('kelolatoko')->with('success', 'Pengguna berhasil ditambahkan');
-    }
+    $user->assignRole($validated['role']);
+
+    return redirect()->route('kelolatoko')->with('success', 'Pengguna berhasil ditambahkan');
+}
 
     public function updateUser(Request $request, User $user)
     {

@@ -10,11 +10,14 @@ class KasirController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+
         $products = Product::with([
             'category',
             'recipe.items.material'
         ])
             ->where('is_active', 1)
+            ->when(!$user->hasRole('superadmin'), fn($q) => $q->where('store_id', $user->store_id)) // 🔥 tambahkan ini
             ->latest()
             ->get();
 

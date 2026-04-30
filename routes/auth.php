@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\StoreRegistrationController;
+
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -33,6 +35,15 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+    // 🔥 Register toko baru
+    Route::get('register/store', [StoreRegistrationController::class, 'showRegisterStore'])
+        ->name('register.store');
+    Route::post('register/store', [StoreRegistrationController::class, 'registerStore']);
+
+    // 🔥 Register user pakai kode
+    Route::get('register/user', [StoreRegistrationController::class, 'showRegisterUser'])
+        ->name('register.user');
+    Route::post('register/user', [StoreRegistrationController::class, 'registerUser']);
 });
 
 Route::middleware('auth')->group(function () {

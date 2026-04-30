@@ -10,12 +10,16 @@ class Store extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'code',
-        'address',
-        'phone',
-    ];
+    'name', 'code', 'address', 'phone', 'is_active', 'invite_code'
+];
 
+// Auto generate invite code
+protected static function booted()
+{
+    static::creating(function ($store) {
+        $store->invite_code = strtoupper(substr(md5(uniqid()), 0, 8));
+    });
+}
     public function users()
     {
         return $this->hasMany(User::class);
@@ -40,4 +44,4 @@ class Store extends Model
     {
         return $this->hasMany(Shift::class);
     }
-}
+}   

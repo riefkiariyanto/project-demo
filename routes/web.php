@@ -10,6 +10,7 @@ use App\Http\Controllers\KasirController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\Auth\StoreRegistrationController;
 
 
 Route::get('/', function () {

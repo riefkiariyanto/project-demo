@@ -9,22 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('stores', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->string('address');
-    $table->string('invite_code')->unique();
-    $table->timestamps();
-});
-    }
-
+    public function up()
+{
+    Schema::table('stores', function (Blueprint $table) {
+        $table->string('invite_code')->unique()->nullable()->after('code');
+    });
+}
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('stores');
+        Schema::table('stores', function (Blueprint $table) {
+            //
+        });
     }
 };

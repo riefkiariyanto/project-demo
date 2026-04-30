@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "@/Components/Sidebar";
 import SearchBar from "@/Components/SearchBar";
 
-export default function AuthenticatedLayout({ header, children, openCart }) {
+export default function AuthenticatedLayout({ header, children, openCart, hideSearch = false }) {
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(() => {
         try {
@@ -22,26 +22,20 @@ export default function AuthenticatedLayout({ header, children, openCart }) {
             {/* SIDEBAR (FIXED) */}
             <Sidebar open={open} setOpen={setOpen} />
 
-            {/* 🔥 SPACER (WAJIB) */}
-            <div
-                className={`
-                    transition-all duration-300
-                    ${open ? "w-60" : "w-20"}
-                `}
-            />
+            {/* SPACER */}
+            <div className={`transition-all duration-300 ${open ? "w-60" : "w-20"}`} />
 
             {/* CONTENT */}
             <div className="flex-1 min-w-0 flex flex-col">
 
-                {/* SEARCH */}
-                <div className="px-4 pt-2">
-                    <div
-                        className={`transition-all duration-300 ${openCart ? "mr-[320px]" : "mr-0"
-                            }`}
-                    >
-                        <SearchBar onSearch={setSearch} />
+                {/* SEARCH — hanya tampil jika tidak di-hide */}
+                {!hideSearch && (
+                    <div className="px-4 pt-2">
+                        <div className={`transition-all duration-300 ${openCart ? "mr-[320px]" : "mr-0"}`}>
+                            <SearchBar onSearch={setSearch} />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* MAIN */}
                 <main className="flex-1 overflow-auto px-4 pt-3">

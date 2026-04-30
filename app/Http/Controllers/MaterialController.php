@@ -15,7 +15,7 @@ class MaterialController extends Controller
         ]);
     }
 
-  public function store(Request $request)
+ public function store(Request $request)
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
@@ -27,24 +27,18 @@ class MaterialController extends Controller
     ]);
 
     $useInitial = $request->input('use_initial_qty');
-
-    $initialQty = (
-        $useInitial === true ||
-        $useInitial === "true" ||
-        $useInitial === 1 ||
-        $useInitial === "1" ||
-        $useInitial === "on"
-    )
+    $initialQty = in_array($useInitial, [true, "true", 1, "1", "on"], true)
         ? $validated['stock']
         : 0;
 
     Material::create([
-        'name' => $validated['name'],
-        'unit' => $validated['unit'],
-        'stock' => $validated['stock'],
-        'min_stock' => $validated['min_stock'],
-        'buy_price' => $validated['buy_price'],
+        'name'        => $validated['name'],
+        'unit'        => $validated['unit'],
+        'stock'       => $validated['stock'],
+        'min_stock'   => $validated['min_stock'],
+        'buy_price'   => $validated['buy_price'],
         'initial_qty' => $initialQty,
+        'store_id'    => auth()->user()->store_id, // 🔥 tambahkan ini
     ]);
 
     return redirect()->route('kelolatoko');

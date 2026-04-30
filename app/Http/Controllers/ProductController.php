@@ -11,16 +11,19 @@ use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::with(['category', 'store'])
-            ->latest()
-            ->paginate(10);
+   public function index()
+{
+    $user = auth()->user();
 
-        return Inertia::render('Products/Index', [
-            'products' => $products,
-        ]);
-    }
+    $products = Product::with(['category', 'store'])
+        ->when(!$user->hasRole('superadmin'), fn($q) => $q->where('store_id', $user->store_id))
+        ->latest()
+        ->paginate(10);
+
+    return Inertia::render('Products/Index', [
+        'products' => $products,
+    ]);
+}
 
     public function create()
     {

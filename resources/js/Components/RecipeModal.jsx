@@ -96,7 +96,7 @@ export default function RecipeModal({
                 <div className="col-span-2">
                   <input
                     type="number"
-                    min=""
+                    min="0"
                     step="1"
                     value={row.qty}
                     onChange={(e) => updateRow(index, 'qty', e.target.value)}
