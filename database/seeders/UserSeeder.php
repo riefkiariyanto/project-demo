@@ -4,30 +4,45 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $superadmin = User::create([
-            'name' => 'superadmin',
-            'email' => '1@gmail.com',
-            'password' => bcrypt('password')
-        ]);
-        $superadmin->assignRole('superadmin');
+        // ✅ BUAT ROLE DULU
+        $superadminRole = Role::firstOrCreate(['name' => 'superadmin']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
 
-        $admin = User::create([
-            'name' => 'admin',
-            'email' => '2@gmail.com',
-            'password' => bcrypt('password')
-        ]);
-        $admin->assignRole('admin');
+        // ✅ SUPERADMIN
+        $superadmin = User::firstOrCreate(
+            ['email' => '1@gmail.com'],
+            [
+                'name' => 'superadmin',
+                'password' => bcrypt('password')
+            ]
+        );
+        $superadmin->assignRole($superadminRole);
 
-        $user = User::create([
-            'name' => 'user',
-            'email' => '3@gmail.com',
-            'password' => bcrypt('password')
-        ]);
-        $user->assignRole('user');
+        // ✅ ADMIN
+        $admin = User::firstOrCreate(
+            ['email' => '2@gmail.com'],
+            [
+                'name' => 'admin',
+                'password' => bcrypt('password')
+            ]
+        );
+        $admin->assignRole($adminRole);
+
+        // ✅ USER
+        $user = User::firstOrCreate(
+            ['email' => '3@gmail.com'],
+            [
+                'name' => 'user',
+                'password' => bcrypt('password')
+            ]
+        );
+        $user->assignRole($userRole);
     }
 }

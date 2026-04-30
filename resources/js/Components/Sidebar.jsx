@@ -16,7 +16,7 @@ export default function Sidebar({ open, setOpen }) {
 
     const getDashboardLink = () => {
         if (roles.includes("superadmin")) return "/superadmin";
-        if (roles.includes("admin")) return "/admin";
+        if (roles.includes("admin")) return "/admindashboard";
         return "/dashboard";
     };
 

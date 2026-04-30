@@ -30,7 +30,7 @@ Route::middleware(['auth', 'role:superadmin|user|admin'])->group(function () {
     Route::get('/kasir', fn () => Inertia::render('Kasir'));
 });
 Route::middleware(['auth', 'role:superadmin|admin'])->group(function () {
-    Route::get('/kelolatoko', fn () => Inertia::render('KelolaToko'));
+    Route::get('/kelolatoko', fn () => Inertia::render('Admin/KelolaToko'));
 });
 
 require __DIR__.'/admin.php';
