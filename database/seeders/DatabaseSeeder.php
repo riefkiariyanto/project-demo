@@ -16,6 +16,16 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
+<<<<<<< HEAD
         ]);
     }
 }
+=======
+            CategorySeeder::class,
+            MaterialSeeder::class,
+            ProductSeeder::class,
+        ]);
+    }
+}
+
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d

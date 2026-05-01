@@ -4,7 +4,11 @@ import {
     ChevronRightIcon,
 } from "@heroicons/react/24/solid";
 
+<<<<<<< HEAD
 export default function ListCategoryMenu({ categories }) {
+=======
+export default function ListCategoryMenu({ categories, selectedCategory, onSelectCategory }) {
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     const scrollRef = useRef();
 
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -105,6 +109,7 @@ export default function ListCategoryMenu({ categories }) {
                 no-scrollbar select-none
             "
             >
+<<<<<<< HEAD
                 {categories.map((cat, i) => (
                     <button
                         key={i}
@@ -118,6 +123,43 @@ export default function ListCategoryMenu({ categories }) {
                     "
                     >
                         {cat}
+=======
+                <button
+                    onClick={() => onSelectCategory(null)}
+                    className={`
+                    min-w-[120px] flex-shrink-0
+                    backdrop-blur-md 
+                    border border-white/40
+                    text-white px-6 py-3 rounded-xl shadow
+                    transition text-sm font-medium
+                    ${
+                        selectedCategory === null
+                            ? "bg-orange-500"
+                            : "bg-orange-400/70 hover:bg-orange-500"
+                    }
+                `}
+                >
+                    Semua
+                </button>
+                {categories.map((cat, i) => (
+                    <button
+                        key={i}
+                        onClick={() => onSelectCategory(cat.id)}
+                        className={`
+                        min-w-[120px] flex-shrink-0
+                        backdrop-blur-md 
+                        border border-white/40
+                        text-white px-6 py-3 rounded-xl shadow
+                        transition text-sm font-medium
+                        ${
+                            selectedCategory === cat.id
+                                ? "bg-orange-500"
+                                : "bg-orange-400/70 hover:bg-orange-500"
+                        }
+                    `}
+                    >
+                        {cat.name}
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                     </button>
                 ))}
             </div>

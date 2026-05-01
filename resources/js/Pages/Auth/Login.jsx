@@ -7,6 +7,10 @@ import { Mail, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function Login({ status, canResetPassword }) {
+<<<<<<< HEAD
+=======
+    // Inertia automatically handles CSRF tokens, no need to manually add _token
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({ email: "", password: "", remember: false });
 
@@ -219,6 +223,7 @@ export default function Login({ status, canResetPassword }) {
                         </PrimaryButton>
                     </form>
 
+<<<<<<< HEAD
                     {/* REGISTER */}
                     <div className="mt-6 text-center text-sm text-gray-400">
                         Belum punya akun?{" "}
@@ -229,6 +234,22 @@ export default function Login({ status, canResetPassword }) {
                             Daftar
                         </Link>
                     </div>
+=======
+                   {/* REGISTER */}
+<div className="mt-6 text-center text-sm text-gray-400">
+    <p>Belum punya akun?</p>
+    <div className="flex gap-3 justify-center mt-2">
+        <Link href={route('register.store')}
+            className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition">
+            Daftar Toko Baru
+        </Link>
+        <Link href={route('register.user')}
+            className="px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition">
+            Punya Kode Toko
+        </Link>
+    </div>
+</div>
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                 </div>
             </div>
         </>

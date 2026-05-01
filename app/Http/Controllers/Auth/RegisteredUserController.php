@@ -49,7 +49,13 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+<<<<<<< HEAD
         return redirect(route('dashboard', absolute: false));
 
+=======
+        $request->session()->regenerate();
+
+        return redirect(route('dashboard', absolute: false));
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     }
 }

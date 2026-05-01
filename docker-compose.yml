@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 version: "3.8"
 
 services:
   app:
+=======
+version: "3"
+
+services:
+  app:
+    user : "1000:1000"
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -58,6 +66,10 @@ services:
       - laravel
 
   node:
+<<<<<<< HEAD
+=======
+    user: "1000:1000"
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     image: node:20-alpine
     container_name: node_app
     working_dir: /var/www

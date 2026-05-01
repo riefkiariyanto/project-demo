@@ -16,10 +16,17 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
         root.render(<App {...props} />);
     },
     progress: {
         color: '#97cc12',
     },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d

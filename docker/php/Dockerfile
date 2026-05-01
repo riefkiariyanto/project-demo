@@ -8,7 +8,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install \
     pdo pdo_mysql mbstring zip exif pcntl intl
+<<<<<<< HEAD
 RUN docker-php-ext-install pdo pdo_mysql
+=======
+
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
 # OPcache
 RUN docker-php-ext-install opcache
 

@@ -7,6 +7,7 @@ export default defineConfig({
         host: "0.0.0.0",
         port: 5173,
         strictPort: true,
+<<<<<<< HEAD
 
         hmr: {
             host: "localhost",
@@ -15,6 +16,17 @@ export default defineConfig({
             usePolling: true,
         },
     },
+=======
+        watch: {
+            usePolling: true,
+        },
+        hmr: {
+            host: 'localhost',
+        },
+        cors: true,
+    },
+
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     plugins: [
         laravel({
             input: "resources/js/app.jsx",
@@ -22,4 +34,8 @@ export default defineConfig({
         }),
         react(),
     ],
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d

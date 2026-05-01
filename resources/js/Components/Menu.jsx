@@ -1,9 +1,20 @@
+<<<<<<< HEAD
 import { useRef, useState, useEffect } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import ListCategoryMenu from "@/Components/ListCategoryMenu";
 
 export default function Menu({ onAdd, openCart }) {
     const scrollRef = useRef();
+=======
+import { useRef, useState, useEffect, useMemo } from "react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import ListCategoryMenu from "@/Components/ListCategoryMenu";
+
+export default function Menu({ onAdd, openCart, products = [], categories = [] }) {
+    const scrollRef = useRef();
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [search, setSearch] = useState("");
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
 
     // DRAG STATE
     const [isDown, setIsDown] = useState(false);
@@ -43,6 +54,52 @@ export default function Menu({ onAdd, openCart }) {
         return () => window.removeEventListener("mouseup", handleUp);
     }, []);
 
+<<<<<<< HEAD
+=======
+    // Filter products by category and search
+    const filteredProducts = useMemo(() => {
+        let result = products;
+
+        if (selectedCategory) {
+            result = result.filter((product) => 
+                product.category_id === selectedCategory
+            );
+        }
+
+        if (search) {
+            result = result.filter((product) =>
+                (product.name || "").toLowerCase().includes(search.toLowerCase())
+            );
+        }
+
+        return result;
+    }, [products, selectedCategory, search]);
+
+    // Get unique categories from products
+    const categoryOptions = useMemo(() => {
+        return categories.filter((cat) =>
+            products.some((p) => p.category_id === cat.id)
+        );
+    }, [categories, products]);
+
+    const getInitials = (name) => {
+        return name
+            .split(" ")
+            .map((word) => word[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+        }).format(price);
+    };
+
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     return (
         <div className="
                 w-full
@@ -61,11 +118,17 @@ export default function Menu({ onAdd, openCart }) {
                 <div className="flex items-center bg-white/30 rounded-full px-3 py-1">
                     <input
                         placeholder="Search menu..."
+<<<<<<< HEAD
+=======
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                         className="bg-transparent w-full text-orange-400 font-semibold placeholder-orange-400 border-0 outline-none focus:ring-0 focus:outline-none" />
                     <MagnifyingGlassIcon className="w-6 h-6 text-orange-500 drop-shadow-sm " />
                 </div>
             </div>
 
+<<<<<<< HEAD
             <ListCategoryMenu categories={[
                 'ayam',
                 'sapi',
@@ -88,6 +151,13 @@ export default function Menu({ onAdd, openCart }) {
                 'nasi',
                 'minuman'
             ]} />
+=======
+            <ListCategoryMenu 
+                categories={categoryOptions} 
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+            />
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
 
             {/* SCROLL AREA */}
             <div
@@ -108,6 +178,7 @@ export default function Menu({ onAdd, openCart }) {
                     overscroll-contain
                 "
             >
+<<<<<<< HEAD
                 <div className="grid px-4 py-4 grid-cols-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {[...Array(20)].map((_, i) => (
                         <div
@@ -146,6 +217,70 @@ export default function Menu({ onAdd, openCart }) {
                             </button>
                         </div>
                     ))}
+=======
+                <div className="grid px-4 py-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product) => (
+                            <div
+                                key={product.id}
+                                className="bg-white/40 backdrop-blur-md rounded-2xl p-3 shadow-lg hover:scale-105 transition"
+                            >
+                                <div className="relative h-36 flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500 rounded-xl text-white text-2xl font-bold mb-2 overflow-hidden">
+                                    {product.image ? (
+                                        <img
+                                            src={`/storage/${product.image}`}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span>{getInitials(product.name)}</span>
+                                    )}
+
+                                    <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
+                                        product.available_stock > 0
+                                            ? "bg-green-100 text-green-600"
+                                            : "bg-red-100 text-red-600"
+                                    }`}>
+                                        {product.available_stock > 0 ? "Tersedia" : "Habis"}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between mt-1">
+                                    <div className="text-xs text-black font-semibold line-clamp-1">
+                                        {product.name}
+                                    </div>
+
+                                    <div className="text-black font-bold text-sm">
+                                        {formatPrice(product.selling_price)}
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() =>
+                                        onAdd({
+                                            id: product.id,
+                                            name: product.name,
+                                            price: product.selling_price,
+                                            selling_price: product.selling_price,
+                                        })
+                                    }
+                                    disabled={product.available_stock <= 0}
+                                    className={`mt-2 w-full py-2 rounded-lg font-semibold transition ${
+                                        product.available_stock > 0
+                                            ? "bg-orange-500 text-white hover:bg-orange-600"
+                                            : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                                    }`}
+                                >
+                                    {product.available_stock > 0 ? "+ Add" : "Habis"}
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full flex items-center justify-center py-8 text-gray-400">
+                            <p>Tidak ada menu yang ditemukan</p>
+                        </div>
+                    )}
+>>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                 </div>
             </div>
         </div>
