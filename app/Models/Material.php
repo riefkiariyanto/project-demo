@@ -21,4 +21,8 @@ class Material extends Model
     {
         return $this->belongsTo(Store::class);
     }
+    public function recipes()
+{
+    return $this->hasOne(Recipe::class);
+}
 }

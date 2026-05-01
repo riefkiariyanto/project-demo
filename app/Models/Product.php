@@ -4,24 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Recipe; // 🔥 fix huruf kapital
 
 class Product extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'category_id',
-        'store_id',
-        'sku',
-        'name',
-        'description',
-        'cost_price',
-        'selling_price',
-        'stock',
-        'unit',
-        'image',
-        'is_active',
+        'category_id', 'store_id', 'sku', 'name', 'description',
+        'cost_price', 'selling_price', 'stock', 'unit', 'image', 'is_active',
     ];
 
     protected $appends = ['available_stock'];
@@ -47,6 +38,7 @@ class Product extends Model
         return $this->hasMany(SaleItem::class);
     }
 
+    // 🔥 ganti jadi singular & hasOne yang benar
     public function recipe()
     {
         return $this->hasOne(Recipe::class);
@@ -57,43 +49,28 @@ class Product extends Model
         return $this->hasMany(StockMovement::class);
     }
 
+    // 🔥 fix available_stock — pakai recipe (singular) → items
     public function getAvailableStockAttribute()
     {
-        if (
-            !$this->relationLoaded('recipe') ||
-            !$this->recipe
-        ) {
+        if (!$this->relationLoaded('recipe') || !$this->recipe) {
             return $this->stock ?? 0;
         }
 
-        if (
-            !$this->recipe->relationLoaded('items') ||
-            $this->recipe->items->isEmpty()
-        ) {
+        if (!$this->recipe->relationLoaded('items') || $this->recipe->items->isEmpty()) {
             return $this->stock ?? 0;
         }
 
         $stocks = [];
 
-        foreach ($this->recipe->items as $item) {
-            if (
-                !$item->relationLoaded('material') ||
-                !$item->material
-            ) {
+        foreach ($this->recipe->items as $recipeItem) {
+            if (!$recipeItem->relationLoaded('material') || !$recipeItem->material) {
                 continue;
             }
+            if ($recipeItem->qty <= 0) continue;
 
-            if ($item->qty <= 0) {
-                continue;
-            }
-
-            $stocks[] = floor(
-                $item->material->stock / $item->qty
-            );
+            $stocks[] = floor($recipeItem->material->stock / $recipeItem->qty);
         }
 
-        return count($stocks)
-            ? min($stocks)
-            : 0;
+        return count($stocks) ? min($stocks) : ($this->stock ?? 0);
     }
 }
