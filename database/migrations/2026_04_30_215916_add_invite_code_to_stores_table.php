@@ -12,7 +12,9 @@ return new class extends Migration
     public function up()
 {
     Schema::table('stores', function (Blueprint $table) {
-        $table->string('invite_code')->unique()->nullable()->after('code');
+        if (!Schema::hasColumn('stores', 'invite_code')) {
+            $table->string('invite_code')->unique()->nullable(); // 🔥 hapus ->after('code')
+        }
     });
 }
     /**

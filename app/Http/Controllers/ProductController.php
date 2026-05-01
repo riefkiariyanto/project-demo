@@ -65,23 +65,34 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, Product $product)
-    {
-        if (
-            auth()->user()->hasRole('admin') &&
-            $product->store_id !== auth()->user()->store_id
-        ) {
-            abort(403);
-        }
-
-        $data = $request->validated();
-        unset($data['store_id']);
-
-        $product->update($data);
-
-        return redirect()
-            ->route('kelolatoko')
-            ->with('success', 'Produk berhasil diupdate');
+{
+    if (
+        auth()->user()->hasRole('admin') &&
+        $product->store_id !== auth()->user()->store_id
+    ) {
+        abort(403);
     }
+
+    $data = $request->validated();
+    unset($data['store_id']);
+
+    // 🔥 Handle image upload
+    if ($request->hasFile('image')) {
+        // Hapus gambar lama kalau ada
+        if ($product->image) {
+            \Storage::disk('public')->delete($product->image);
+        }
+        $data['image'] = $request->file('image')->store('products', 'public');
+    } else {
+        unset($data['image']); // jangan overwrite kalau tidak ada gambar baru
+    }
+
+    $product->update($data);
+
+    return redirect()
+        ->route('kelolatoko')
+        ->with('success', 'Produk berhasil diupdate');
+}
 
     public function destroy(Product $product)
     {

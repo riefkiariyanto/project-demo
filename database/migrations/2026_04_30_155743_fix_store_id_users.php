@@ -9,10 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->unsignedBigInteger('store_id')->nullable();
+        // 🔥 Tambahkan pengecekan sebelum add column
+        if (!Schema::hasColumn('users', 'store_id')) {
+            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
+        }
     });
 }
 

@@ -140,6 +140,9 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
     const [showRecipeModal, setShowRecipeModal] = useState(false);
     const [editingMaterial, setEditingMaterial] = useState(null);
     const [editingUser, setEditingUser] = useState(null);
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [showEditMenuModal, setShowEditMenuModal] = useState(false);
+    const [imagePreview, setImagePreview] = useState(null);
     const [qtyInputs, setQtyInputs] = useState({});
     const [stockModes, setStockModes] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -191,6 +194,54 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
             onError: () => showNotif("error", "Gagal menyimpan menu."),
         });
     };
+
+    const openEditMenu = (item) => {
+    setEditingProduct(item);
+    setImagePreview(item.image ? `/storage/${item.image}` : null);
+    setData({
+        name: item.name ?? "",
+        category_id: item.category_id ?? "",
+        selling_price: item.selling_price ?? "",
+        sku: item.sku ?? "",
+        cost_price: item.cost_price ?? 0,
+        stock: item.stock ?? 0,
+        unit: item.unit ?? "pcs",
+        is_active: item.is_active ? 1 : 0,
+        min_stock: item.min_stock ?? 0,
+        image: null,
+    });
+    setShowEditMenuModal(true);
+};
+
+const saveEditMenu = () => {
+    console.log('stock value:', editingProduct.stock, typeof editingProduct.stock);
+    router.post(`/products/${editingProduct.id}`, {
+        _method: 'PUT',
+        name: data.name,
+        category_id: data.category_id,
+        selling_price: Number(data.selling_price),
+        sku: editingProduct.sku,
+        cost_price: Number(editingProduct.cost_price ?? 0),
+        stock: Math.max(0, Math.floor(Number(editingProduct.stock ?? 0))),  // 🔥 Math.max(0, ...)      // 🔥 parseInt
+        unit: editingProduct.unit ?? "pcs",
+        is_active: editingProduct.is_active ? 1 : 0,
+        ...(data.image ? { image: data.image } : {}),
+    }, {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            setShowEditMenuModal(false);
+            setEditingProduct(null);
+            setImagePreview(null);
+            reset();
+            showNotif("success", "Menu berhasil diupdate!");
+        },
+        onError: (errors) => {
+            console.log('Errors:', JSON.stringify(errors));
+            showNotif("error", "Gagal mengupdate menu.");
+        },
+    });
+};
 
     const openAddMaterial = () => {
         setEditingMaterial(null); reset();
@@ -330,7 +381,8 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                                     className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-purple-500/40 text-purple-800 text-xs font-semibold hover:bg-purple-500/60 transition">
                                                     <BeakerIcon className="w-3.5 h-3.5" /> Resep
                                                 </button>
-                                                <button type="button" className="p-1.5 rounded-lg bg-blue-500/30 text-blue-800 hover:bg-blue-500/50 transition">
+                                                <button type="button" onClick={() => openEditMenu(item)}
+                                                    className="p-1.5 rounded-lg bg-blue-500/30 text-blue-800 hover:bg-blue-500/50 transition">
                                                     <PencilSquareIcon className="w-4 h-4" />
                                                 </button>
                                                 <button type="button" onClick={() => router.delete(`/products/${item.id}`, { onSuccess: () => showNotif("success", "Menu dihapus!") })}
@@ -488,6 +540,78 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                     <input type="number" placeholder="0" className={inputCls} onChange={(e) => setData("selling_price", e.target.value)} />
                 </div>
             </Modal>
+
+                {/* MODAL EDIT MENU */}
+<Modal show={showEditMenuModal} onClose={() => { setShowEditMenuModal(false); setImagePreview(null); }}
+    title="Edit Menu" subtitle={`Edit produk: ${editingProduct?.name}`}
+    footer={<>
+        <button onClick={() => { setShowEditMenuModal(false); setImagePreview(null); }}
+            className="px-5 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30 transition text-sm">Batal</button>
+        <button onClick={saveEditMenu}
+            className="px-5 py-2 rounded-xl bg-white text-orange-500 font-semibold hover:bg-orange-50 transition text-sm">Simpan</button>
+    </>}>
+
+    {/* IMAGE UPLOAD */}
+    <div>
+        <label className={labelCls}>Foto Produk</label>
+        <div className="relative w-full h-36 rounded-xl overflow-hidden border border-white/30 bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20 transition"
+            onClick={() => document.getElementById('edit-image-input').click()}>
+            {imagePreview ? (
+                <>
+                    <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                        <p className="text-white text-sm font-semibold">Ganti Foto</p>
+                    </div>
+                </>
+            ) : (
+                <div className="text-center text-white/50">
+                    <div className="text-3xl mb-1">📷</div>
+                    <p className="text-xs">Klik untuk upload foto</p>
+                </div>
+            )}
+        </div>
+        <input
+            id="edit-image-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+    const file = e.target.files[0];
+    if (file) {
+        // 🔥 Cek ukuran file maksimal 2MB
+        if (file.size > 2 * 1024 * 1024) {
+            showNotif("error", "Ukuran foto maksimal 2MB!");
+            e.target.value = ""; // reset input
+            return;
+        }
+        setData("image", file);
+        setImagePreview(URL.createObjectURL(file));
+    }
+}}
+        />
+    </div>
+
+    <div>
+        <label className={labelCls}>Nama Menu</label>
+        <input value={data.name} onChange={(e) => setData("name", e.target.value)}
+            placeholder="Nama Menu" className={inputCls} />
+    </div>
+    <div>
+        <label className={labelCls}>Kategori</label>
+        <CustomSelect
+            value={data.category_id}
+            onChange={(v) => setData("category_id", v)}
+            options={categoryOptions}
+            placeholder="Pilih Kategori"
+        />
+    </div>
+    <div>
+        <label className={labelCls}>Harga Jual</label>
+        <input type="number" value={data.selling_price}
+            onChange={(e) => setData("selling_price", e.target.value)}
+            placeholder="0" className={inputCls} />
+    </div>
+</Modal>
 
             {/* MODAL BAHAN */}
             <Modal show={showMaterialModal} onClose={() => setShowMaterialModal(false)}
