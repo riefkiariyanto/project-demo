@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::table('stores', function (Blueprint $table) {
         if (!Schema::hasColumn('stores', 'invite_code')) {
-            $table->string('invite_code')->unique()->nullable(); // 🔥 hapus ->after('code')
+            $table->string('invite_code')->unique()->nullable();
         }
     });
 }
