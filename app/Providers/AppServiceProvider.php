@@ -19,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // 🔥 Clear permission cache
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+       // 🔥 Hanya jalankan saat runtime, bukan saat build
+    if (!$this->app->runningInConsole()) {
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }
