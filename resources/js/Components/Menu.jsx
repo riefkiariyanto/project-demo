@@ -66,7 +66,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
     };
 
     return (
-        <div className="w-full min-w-[280px] bg-white/30 backdrop-blur-xl rounded-2xl p-3 border border-white/30 max-h-[800px] flex flex-col">
+        <div className="w-full min-w-[280px] bg-white/30 backdrop-blur-xl rounded-2xl p-3 border border-white/30 h-full min-h-0 flex flex-col">
             {/* HEADER */}
             <div className="flex px-6 justify-between items-center mb-2">
                 <h2 className="text-xl font-bold text-white">Semua menu</h2>
@@ -124,7 +124,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                                 </div>
 
                                 {/* INFO — nama dan harga stacked vertikal */}
-                                <div className="mt-1.5 flex-1 space-y-0 px-0.5">
+                                <div className="mt-1.5 flex-1 space-y-0.5 px-0.5">
                                     <p className="text-xs text-black font-semibold line-clamp-2 leading-tight">
                                         {product.name}
                                     </p>

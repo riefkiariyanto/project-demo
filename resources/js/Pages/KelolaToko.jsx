@@ -34,7 +34,7 @@ function CustomSelect({ value, onChange, options, placeholder = "Pilih...", disa
                 <ChevronDownIcon className={`w-4 h-4 text-white/60 transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
             {open && (
-                <div className="absolute z-[60] mt-1 w-full rounded-xl bg-orange-900/90 backdrop-blur-xl border border-white/20 shadow-2xl overflow-hidden">
+                <div className="absolute z-[60] mt-1 w-full rounded-xl bg-orange-900/90 backdrop-blur-xl border border-white/20 shadow-2xl max-h-60 overflow-y-auto overscroll-contain no-scrollbar">
                     {options.map((opt) => (
                         <div key={opt.value}
                             onClick={() => { onChange(opt.value); setOpen(false); }}

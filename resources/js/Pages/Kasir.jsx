@@ -32,7 +32,7 @@ export default function Kasir({ products = [], categories = [] }) {
             <div className="flex gap-4 h-full overflow-hidden">
 
                 {/* MENU */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 min-h-0">
                     <Menu 
                         onAdd={handleAddToCart} 
                         openCart={openCart}
