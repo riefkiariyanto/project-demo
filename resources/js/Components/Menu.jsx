@@ -71,6 +71,12 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
             <div className="flex px-6 justify-between items-center mb-2">
                 <h2 className="text-xl font-bold text-white">Semua menu</h2>
                 <div className="flex items-center bg-white/30 rounded-full px-3 py-1">
+                    <input
+                        placeholder="Search menu..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="bg-transparent w-full text-orange-400 font-semibold placeholder-orange-400 border-0 outline-none focus:ring-0 focus:outline-none"
+                    />
                     <MagnifyingGlassIcon className="w-6 h-6 text-orange-500 drop-shadow-sm" />
                 </div>
             </div>
