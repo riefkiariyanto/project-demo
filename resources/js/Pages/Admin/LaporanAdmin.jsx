@@ -7,7 +7,9 @@ import {
 import {
     PrinterIcon, XMarkIcon, ChevronRightIcon,
     BanknotesIcon, ShoppingCartIcon, CubeIcon,
+    CalendarDaysIcon, ArrowPathIcon,
 } from "@heroicons/react/24/solid";
+import axios from "axios";
 
 
 // ─── Format helpers ───────────────────────────────────────────────────────────
@@ -18,6 +20,12 @@ const formatRpShort = (v) => {
     if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}jt`;
     if (v >= 1_000) return `${(v / 1_000).toFixed(0)}k`;
     return `${v}`;
+};
+
+// Tanggal hari ini format YYYY-MM-DD (lokal)
+const todayStr = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
 // ─── Nota Print Modal ─────────────────────────────────────────────────────────
@@ -49,7 +57,6 @@ function NotaModal({ sale, onClose }) {
     return (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
             <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden">
-                {/* Header */}
                 <div className="flex justify-between items-center px-5 py-4 bg-orange-500 text-white">
                     <h3 className="font-bold">Nota Transaksi</h3>
                     <div className="flex gap-2">
@@ -62,29 +69,14 @@ function NotaModal({ sale, onClose }) {
                         </button>
                     </div>
                 </div>
-
-                {/* Nota Content */}
                 <div ref={printRef} className="p-5 font-mono text-sm text-black">
                     <div className="center bold big mb-1">WARKOP POS</div>
                     <div className="center text-xs text-gray-500 mb-3">Nota Pembelian</div>
                     <div className="divider" style={{ borderTop: "1px dashed #ccc", margin: "8px 0" }} />
-
-                    <div className="row">
-                        <span>No. Invoice</span>
-                        <span className="bold">{sale.invoice_no}</span>
-                    </div>
-                    <div className="row">
-                        <span>Tanggal</span>
-                        <span>{sale.sale_date}</span>
-                    </div>
-                    <div className="row">
-                        <span>Pembayaran</span>
-                        <span>{sale.payment_method}</span>
-                    </div>
-
+                    <div className="row"><span>No. Invoice</span><span className="bold">{sale.invoice_no}</span></div>
+                    <div className="row"><span>Tanggal</span><span>{sale.sale_date}</span></div>
+                    <div className="row"><span>Pembayaran</span><span>{sale.payment_method}</span></div>
                     <div className="divider" style={{ borderTop: "1px dashed #ccc", margin: "8px 0" }} />
-
-                    {/* Items */}
                     {sale.items?.map((item, i) => (
                         <div key={i} className="mb-1">
                             <div className="bold">{item.name}</div>
@@ -94,25 +86,152 @@ function NotaModal({ sale, onClose }) {
                             </div>
                         </div>
                     ))}
-
                     <div className="divider" style={{ borderTop: "1px dashed #ccc", margin: "8px 0" }} />
-
-                    <div className="row bold">
-                        <span>TOTAL</span>
-                        <span>{formatRp(sale.grand_total)}</span>
-                    </div>
-
-                    <div className="center mt-4 text-xs text-gray-400">
-                        Terima kasih sudah berkunjung! 🙏
-                    </div>
+                    <div className="row bold"><span>TOTAL</span><span>{formatRp(sale.grand_total)}</span></div>
+                    <div className="center mt-4 text-xs text-gray-400">Terima kasih sudah berkunjung! 🙏</div>
                 </div>
             </div>
         </div>
     );
 }
 
+// ─── Summary Section (Cards + Toggle Per Hari) ────────────────────────────────
+function SummarySection({ summary, bulan }) {
+    const [mode, setMode] = useState("bulan"); // "bulan" | "hari"
+    const [tanggal, setTanggal] = useState(todayStr());
+    const [harian, setHarian] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchHarian = async (tgl) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await axios.get("/laporan/harian", { params: { tanggal: tgl } });
+            setHarian(res.data);
+        } catch (e) {
+            setError("Gagal memuat data harian.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch saat pertama kali switch ke mode hari
+    useEffect(() => {
+        if (mode === "hari") fetchHarian(tanggal);
+    }, [mode]);
+
+    const handleTanggalChange = (e) => {
+        setTanggal(e.target.value);
+        fetchHarian(e.target.value);
+    };
+
+    const data = mode === "bulan" ? summary : harian;
+    const labelBanding = mode === "bulan" ? "vs bulan lalu" : (harian?.labelBanding ?? "vs kemarin");
+
+    const cards = [
+        {
+            title: "Total Pendapatan",
+            value: data ? formatRp(data.pendapatan) : "-",
+            growth: data?.growthPendapatan ?? 0,
+            icon: BanknotesIcon,
+            color: "bg-orange-500",
+        },
+        {
+            title: "Total Pesanan",
+            value: data ? (data.pesanan ?? 0) : "-",
+            growth: data?.growthPesanan ?? 0,
+            icon: ShoppingCartIcon,
+            color: "bg-orange-600",
+        },
+        {
+            title: "Item Terjual",
+            value: data ? (data.itemTerjual ?? 0) : "-",
+            growth: data?.growthItem ?? 0,
+            icon: CubeIcon,
+            color: "bg-orange-700",
+        },
+    ];
+
+    return (
+        <div>
+            {/* Toggle + Date Picker */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+                {/* Mode toggle */}
+                <div className="flex bg-white/10 border border-white/20 rounded-xl p-1 gap-1">
+                    <button
+                        onClick={() => setMode("bulan")}
+                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${
+                            mode === "bulan"
+                                ? "bg-orange-500 text-white shadow"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                        }`}
+                    >
+                        Per Bulan
+                    </button>
+                    <button
+                        onClick={() => setMode("hari")}
+                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition ${
+                            mode === "hari"
+                                ? "bg-orange-500 text-white shadow"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                        }`}
+                    >
+                        <CalendarDaysIcon className="w-3.5 h-3.5" />
+                        Per Hari
+                    </button>
+                </div>
+
+                {/* Date picker — tampil kalau mode hari */}
+                {mode === "hari" && (
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="date"
+                            value={tanggal}
+                            max={todayStr()}
+                            onChange={handleTanggalChange}
+                            className="bg-white/10 border border-white/20 text-white text-sm rounded-xl px-3 py-1.5
+                                       focus:outline-none focus:ring-2 focus:ring-orange-400
+                                       [color-scheme:dark] cursor-pointer"
+                        />
+                        {loading && (
+                            <ArrowPathIcon className="w-4 h-4 text-orange-300 animate-spin" />
+                        )}
+                    </div>
+                )}
+
+                {/* Label periode */}
+                <span className="text-white/40 text-sm ml-auto">
+                    {mode === "bulan"
+                        ? bulan
+                        : (harian?.label ?? tanggal)}
+                </span>
+            </div>
+
+            {/* Error */}
+            {error && (
+                <div className="mb-3 px-4 py-2 bg-red-500/20 border border-red-400/30 text-red-300 rounded-xl text-sm">
+                    {error}
+                </div>
+            )}
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {cards.map((card) => (
+                    <SummaryCard
+                        key={card.title}
+                        {...card}
+                        labelBanding={labelBanding}
+                        loading={mode === "hari" && loading}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 // ─── Summary Card ─────────────────────────────────────────────────────────────
-function SummaryCard({ title, value, growth, icon: Icon, color }) {
+function SummaryCard({ title, value, growth, icon: Icon, color, labelBanding, loading }) {
     const isPositive = growth >= 0;
     return (
         <div className="bg-white/10 border border-white/20 rounded-2xl p-5">
@@ -123,12 +242,20 @@ function SummaryCard({ title, value, growth, icon: Icon, color }) {
                 </div>
             </div>
             <div className="flex justify-between items-end">
-                <span className="text-2xl font-bold text-white">{value}</span>
-                <span className={`font-semibold text-sm ${isPositive ? "text-green-400" : "text-red-400"}`}>
-                    {isPositive ? "+" : ""}{growth}%
-                </span>
+                {loading ? (
+                    <div className="h-8 w-24 bg-white/10 rounded-lg animate-pulse" />
+                ) : (
+                    <span className="text-2xl font-bold text-white">{value}</span>
+                )}
+                {loading ? (
+                    <div className="h-5 w-12 bg-white/10 rounded animate-pulse" />
+                ) : (
+                    <span className={`font-semibold text-sm ${isPositive ? "text-green-400" : "text-red-400"}`}>
+                        {isPositive ? "+" : ""}{growth}%
+                    </span>
+                )}
             </div>
-            <p className="text-xs text-white/40 mt-1">vs bulan lalu</p>
+            <p className="text-xs text-white/40 mt-1">{labelBanding}</p>
         </div>
     );
 }
@@ -136,14 +263,11 @@ function SummaryCard({ title, value, growth, icon: Icon, color }) {
 // ─── Chart Penjualan ──────────────────────────────────────────────────────────
 function ChartPenjualan({ chartData }) {
     const [minggu, setMinggu] = useState(1);
-
     const weeks = [1, 2, 3, 4];
 
-    // Group by week
     const weeklyData = useMemo(() => {
         const days = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
         const result = days.map(d => ({ day: d, value: 0 }));
-
         chartData.forEach(row => {
             const date = new Date(row.date);
             const weekNum = Math.ceil(date.getDate() / 7);
@@ -152,8 +276,6 @@ function ChartPenjualan({ chartData }) {
                 result[dayIdx].value += row.total;
             }
         });
-
-        // Reorder to Mon-Sun
         return [...result.slice(1), result[0]];
     }, [chartData, minggu]);
 
@@ -226,11 +348,9 @@ function KalenderPenjualan({ kalenderData }) {
                     <p className="text-white/60 text-sm mt-0.5">{months[month]} {year}</p>
                 </div>
             </div>
-
             <div className="grid grid-cols-7 gap-1.5 mb-2 text-xs text-white/50">
                 {daysName.map(d => <div key={d} className="text-center">{d}</div>)}
             </div>
-
             <div className="grid grid-cols-7 gap-1.5">
                 {Array.from({ length: totalCells }).map((_, i) => {
                     const day = i - firstDay + 1;
@@ -247,7 +367,6 @@ function KalenderPenjualan({ kalenderData }) {
                     );
                 })}
             </div>
-
             <div className="flex justify-between items-center mt-3 text-[10px] text-white/40">
                 <span>Sedikit</span>
                 <div className="flex gap-1">
@@ -270,7 +389,6 @@ function MostOrder({ orders }) {
                     <h3 className="font-semibold text-lg">Most Order</h3>
                     <span className="text-xs bg-white/10 px-3 py-1 rounded-full text-white/60">Bulan ini</span>
                 </div>
-
                 <div className="space-y-3">
                     {orders.length > 0 ? orders.map((item, i) => (
                         <div key={i} className="flex items-stretch bg-white/5 hover:bg-white/10 transition rounded-xl overflow-hidden group">
@@ -346,12 +464,9 @@ function RiwayatPesanan({ riwayat, onPrint }) {
                     ))}
                 </div>
             </div>
-
-            {/* Search */}
             <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Cari invoice..."
                 className="w-full mb-3 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-xs focus:outline-none" />
-
             <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar">
                 {filtered.length > 0 ? filtered.map((order) => (
                     <div key={order.id}
@@ -410,30 +525,8 @@ export default function LaporanAdmin({ summary = {}, chartData = [], kalenderDat
                     {/* LEFT */}
                     <div className="flex-1 space-y-6">
 
-                        {/* Summary Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <SummaryCard
-                                title="Total Pendapatan"
-                                value={formatRp(summary.pendapatan)}
-                                growth={summary.growthPendapatan ?? 0}
-                                icon={BanknotesIcon}
-                                color="bg-orange-500"
-                            />
-                            <SummaryCard
-                                title="Total Pesanan"
-                                value={summary.pesanan ?? 0}
-                                growth={summary.growthPesanan ?? 0}
-                                icon={ShoppingCartIcon}
-                                color="bg-orange-600"
-                            />
-                            <SummaryCard
-                                title="Item Terjual"
-                                value={summary.itemTerjual ?? 0}
-                                growth={summary.growthItem ?? 0}
-                                icon={CubeIcon}
-                                color="bg-orange-700"
-                            />
-                        </div>
+                        {/* Summary Cards dengan toggle per hari */}
+                        <SummarySection summary={summary} bulan={bulan} />
 
                         {/* Chart + Most Order */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

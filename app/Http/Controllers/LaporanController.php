@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Inertia\Inertia;
 
@@ -16,7 +17,7 @@ class LaporanController extends Controller
         $isSuperadmin = $user->hasRole('superadmin');
         $storeId = $user->store_id;
 
-        $now = Carbon::now(); // pakai UTC, sama dengan data di database
+        $now = Carbon::now();
         $startOfMonth     = $now->copy()->startOfMonth();
         $endOfMonth       = $now->copy()->endOfMonth();
         $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
@@ -133,6 +134,65 @@ class LaporanController extends Controller
             'mostOrder'    => $mostOrder,
             'riwayat'      => $riwayat,
             'bulan'        => $now->locale('id')->isoFormat('MMMM YYYY'),
+        ]);
+    }
+
+    /**
+     * GET /laporan/harian?tanggal=2025-05-06
+     * Mengembalikan summary (pendapatan, pesanan, item terjual) untuk satu hari,
+     * dibandingkan dengan hari sebelumnya.
+     */
+    public function harian(Request $request)
+    {
+        $request->validate(['tanggal' => 'required|date']);
+
+        $user         = auth()->user();
+        $isSuperadmin = $user->hasRole('superadmin');
+        $storeId      = $user->store_id;
+
+        $hari     = Carbon::parse($request->tanggal)->startOfDay();
+        $hariAkhir = $hari->copy()->endOfDay();
+        $hariLalu  = $hari->copy()->subDay()->startOfDay();
+        $hariLaluAkhir = $hariLalu->copy()->endOfDay();
+
+        $base = fn() => Sale::query()
+            ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $storeId))
+            ->where('status', 'completed');
+
+        // Pendapatan hari ini vs kemarin
+        $pendapatanIni  = (clone $base())->whereBetween('sale_date', [$hari, $hariAkhir])->sum('grand_total');
+        $pendapatanLalu = (clone $base())->whereBetween('sale_date', [$hariLalu, $hariLaluAkhir])->sum('grand_total');
+        $growthPendapatan = $pendapatanLalu > 0
+            ? round((($pendapatanIni - $pendapatanLalu) / $pendapatanLalu) * 100, 1)
+            : ($pendapatanIni > 0 ? 100 : 0);
+
+        // Pesanan
+        $pesananIni  = (clone $base())->whereBetween('sale_date', [$hari, $hariAkhir])->count();
+        $pesananLalu = (clone $base())->whereBetween('sale_date', [$hariLalu, $hariLaluAkhir])->count();
+        $growthPesanan = $pesananLalu > 0
+            ? round((($pesananIni - $pesananLalu) / $pesananLalu) * 100, 1)
+            : ($pesananIni > 0 ? 100 : 0);
+
+        // Item terjual
+        $itemBase = fn() => SaleItem::join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->when(!$isSuperadmin, fn($q) => $q->where('sales.store_id', $storeId))
+            ->where('sales.status', 'completed');
+
+        $itemIni  = (clone $itemBase())->whereBetween('sales.sale_date', [$hari, $hariAkhir])->sum('sale_items.qty');
+        $itemLalu = (clone $itemBase())->whereBetween('sales.sale_date', [$hariLalu, $hariLaluAkhir])->sum('sale_items.qty');
+        $growthItem = $itemLalu > 0
+            ? round((($itemIni - $itemLalu) / $itemLalu) * 100, 1)
+            : ($itemIni > 0 ? 100 : 0);
+
+        return response()->json([
+            'pendapatan'       => (float) $pendapatanIni,
+            'growthPendapatan' => $growthPendapatan,
+            'pesanan'          => $pesananIni,
+            'growthPesanan'    => $growthPesanan,
+            'itemTerjual'      => (int) $itemIni,
+            'growthItem'       => $growthItem,
+            'label'            => Carbon::parse($request->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+            'labelBanding'     => 'vs kemarin',
         ]);
     }
 }
