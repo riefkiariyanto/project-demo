@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Product;
+use App\Models\Material;
 use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -31,8 +32,7 @@ class DashboardController extends Controller
             ? round((($pendapatanHariIni - $pendapatanKemarin) / $pendapatanKemarin) * 100, 1)
             : ($pendapatanHariIni > 0 ? 100 : 0);
 
-        $lowStock = Product::where('store_id', $storeId)
-            ->where('is_active', 1)
+        $lowStock = Material::where('store_id', $storeId)
             ->whereColumn('stock', '<=', 'min_stock')
             ->select('id', 'name', 'stock', 'unit', 'min_stock')
             ->limit(5)
@@ -41,7 +41,6 @@ class DashboardController extends Controller
         $recentSales = Sale::where('store_id', $storeId)
             ->where('status', 'completed')
             ->whereDate('sale_date', $today)
-            ->with('items.product:id,name')
             ->orderByDesc('sale_date')
             ->limit(5)
             ->get()
@@ -50,7 +49,7 @@ class DashboardController extends Controller
                 'grand_total'    => (float) $s->grand_total,
                 'payment_method' => $s->payment_method,
                 'sale_date'      => Carbon::parse($s->sale_date)->format('H:i'),
-                'items_count'    => $s->items->sum('qty'),
+                'items_count'    => $s->items()->sum('qty'),
             ]);
 
         return Inertia::render('Dashboard', [
@@ -140,10 +139,9 @@ class DashboardController extends Controller
                 'revenue' => (float) $r->total_revenue,
             ]);
 
-        $lowStock = Product::where('store_id', $storeId)
-            ->where('is_active', 1)
+        $lowStock = Material::where('store_id', $storeId)
             ->whereColumn('stock', '<=', 'min_stock')
-            ->select('id', 'name', 'stock', 'unit', 'min_stock', 'image')
+            ->select('id', 'name', 'stock', 'unit', 'min_stock')
             ->limit(5)
             ->get();
 
