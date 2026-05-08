@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/react";
 import Menu from "@/Components/Menu";
 import Cart from "@/Components/Cart";
 
-export default function Kasir({ products = [], categories = [] }) {
+export default function Kasir({ products = [], categories = [], qris_image = null }) {
     const [cart, setCart] = useState([]);
     const [openCart, setOpenCart] = useState(false);
     const handleAddToCart = (item) => {
@@ -50,6 +50,7 @@ export default function Kasir({ products = [], categories = [] }) {
                         open={openCart}
                         setOpen={setOpenCart}
                         setCart={setCart}
+                        qrisImage={qris_image}
                     />
                 </div>
 

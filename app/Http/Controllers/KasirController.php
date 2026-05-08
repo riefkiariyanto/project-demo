@@ -24,8 +24,9 @@ class KasirController extends Controller
         $categories = Category::all();
 
         return Inertia::render('Kasir', [
-            'products' => $products,
+            'products'   => $products,
             'categories' => $categories,
+            'qris_image' => $user->store?->qris_image,
         ]);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    Route::get('/superadmin', fn () => Inertia::render('SuperAdmin/SuperAdminDashboard'));
+    Route::get('/superadmin', [DashboardController::class, 'superadmin'])->name('superadmin.dashboard');
 });

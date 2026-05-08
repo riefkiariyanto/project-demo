@@ -130,6 +130,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
     const [editingProduct, setEditingProduct] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [logoPreview, setLogoPreview] = useState(store?.logo ? `/storage/${store.logo}` : null);
+    const [qrisPreview, setQrisPreview] = useState(store?.qris_image ? `/storage/${store.qris_image}` : null);
     const [qtyInputs, setQtyInputs] = useState({});
     const [stockModes, setStockModes] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -142,7 +143,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
         setTimeout(() => setNotif(null), 3500);
     };
 
-    const { data, setData, post, put, reset } = useForm({
+    const { data, setData, post, put, reset, errors } = useForm({
         name: "", category_id: "", selling_price: "", image: null,
         sku: "SKU-" + Date.now(), cost_price: 0, stock: 0, unit: "pcs",
         is_active: 1, min_stock: 0, buy_price: 0, qty: 0,
@@ -156,6 +157,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
         address: store?.address ?? "",
         phone: store?.phone ?? "",
         logo: null,
+        qris_image: null,
     });
 
     const filteredProducts = useMemo(() =>
@@ -225,7 +227,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
     // ── Material ──────────────────────────────────────────────────────────────
     const openAddMaterial = () => {
         setEditingMaterial(null); reset();
-        setData({ name: "", stock: "", unit: "pcs", min_stock: "", buy_price: "", qty: "" });
+        setData({ name: "", stock: "", unit: "pcs", min_stock: "", buy_price: "", qty: "", use_initial_qty: false });
         setShowMaterialModal(true);
     };
 
@@ -349,7 +351,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                     <div className="flex items-center bg-white/20 rounded-full px-3 py-1.5 gap-2 w-full sm:w-64">
                         <MagnifyingGlassIcon className="w-4 h-4 text-white/70 shrink-0" />
                         <input placeholder="Cari..." value={search} onChange={(e) => setSearch(e.target.value)}
-                            className="bg-transparent flex-1 text-orange-400 font-bold placeholder-white/90 text-sm outline-none focus:outline-none focus:ring-0 border-none" />
+                            className="bg-transparent flex-1 text-orange-400 dark:text-white font-bold placeholder-white/90 text-sm outline-none focus:outline-none focus:ring-0 border-none" />
                     </div>
                 </GlassCard>
 
@@ -380,23 +382,23 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                         <div className="p-3 space-y-2">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="font-semibold text-orange-600 text-sm">{item.name}</p>
-                                                    <p className="text-xs text-orange-600/90">{item.category?.name ?? "-"}</p>
+                                                    <p className="font-semibold text-orange-600 dark:text-white text-sm">{item.name}</p>
+                                                    <p className="text-xs text-orange-600/90 dark:text-white/70">{item.category?.name ?? "-"}</p>
                                                 </div>
-                                                <p className="font-bold text-orange-600 text-sm">{formatRp(item.selling_price)}</p>
+                                                <p className="font-bold text-orange-600 dark:text-white text-sm">{formatRp(item.selling_price)}</p>
                                             </div>
-                                            <p className="text-xs text-orange-600/60">Stok: {Math.floor(item.available_stock || 0)}</p>
+                                            <p className="text-xs text-orange-600/60 dark:text-white/50">Stok: {Math.floor(item.available_stock || 0)}</p>
                                             <div className="flex gap-2 pt-1">
                                                 <button type="button" onClick={() => openRecipe(item)}
-                                                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-purple-500/40 text-purple-800 text-xs font-semibold hover:bg-purple-500/60 transition">
+                                                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-purple-500/40 text-purple-800 dark:text-white text-xs font-semibold hover:bg-purple-500/60 transition">
                                                     <BeakerIcon className="w-3.5 h-3.5" /> Resep
                                                 </button>
                                                 <button type="button" onClick={() => openEditMenu(item)}
-                                                    className="p-1.5 rounded-lg bg-blue-500/30 text-blue-800 hover:bg-blue-500/50 transition">
+                                                    className="p-1.5 rounded-lg bg-blue-500/30 text-blue-800 dark:text-white hover:bg-blue-500/50 transition">
                                                     <PencilSquareIcon className="w-4 h-4" />
                                                 </button>
                                                 <button type="button" onClick={() => router.delete(`/products/${item.id}`, { onSuccess: () => showNotif("success", "Menu dihapus!") })}
-                                                    className="p-1.5 rounded-lg bg-red-500/30 text-red-800 hover:bg-red-500/50 transition">
+                                                    className="p-1.5 rounded-lg bg-red-500/30 text-red-800 dark:text-white hover:bg-red-500/50 transition">
                                                     <TrashIcon className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -427,24 +429,24 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                         <div key={item.id} className="bg-white/20 backdrop-blur-md rounded-2xl border border-white/20 p-4 space-y-3 shadow">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <h3 className="font-semibold text-orange-600">{item.name}</h3>
-                                                    <p className="text-xs text-orange-600/60">Stok: {item.stock} {item.unit}</p>
+                                                    <h3 className="font-semibold text-orange-600 dark:text-white">{item.name}</h3>
+                                                    <p className="text-xs text-orange-600/60 dark:text-white/50">Stok: {item.stock} {item.unit}</p>
                                                 </div>
                                                 <div className="flex flex-col items-end gap-1">
-                                                    <span className="text-xs px-2 py-0.5 rounded-lg bg-orange-500/30 text-orange-800">{item.unit}</span>
-                                                    <span className={`text-xs px-2 py-0.5 rounded-lg font-semibold ${item.stock <= item.min_stock ? "bg-red-500/40 text-red-800" : "bg-green-500/40 text-green-800"}`}>
+                                                    <span className="text-xs px-2 py-0.5 rounded-lg bg-orange-500/30 text-orange-800 dark:text-white">{item.unit}</span>
+                                                    <span className={`text-xs px-2 py-0.5 rounded-lg font-semibold ${item.stock <= item.min_stock ? "bg-red-500/40 text-red-800 dark:text-white" : "bg-green-500/40 text-green-800 dark:text-white"}`}>
                                                         {item.stock <= item.min_stock ? "Menipis" : "Aman"}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div className="bg-white/10 rounded-xl p-2.5">
-                                                    <p className="text-xs text-orange-600/90">Harga Beli</p>
-                                                    <p className="font-bold text-orange-800 text-sm">{formatRp(item.buy_price)}</p>
+                                                    <p className="text-xs text-orange-600/90 dark:text-white/70">Harga Beli</p>
+                                                    <p className="font-bold text-orange-800 dark:text-white text-sm">{formatRp(item.buy_price)}</p>
                                                 </div>
                                                 <div className="bg-white/10 rounded-xl p-2.5">
-                                                    <p className="text-xs text-orange-600/90">Nilai Stok</p>
-                                                    <p className="font-bold text-green-800 text-sm">
+                                                    <p className="text-xs text-orange-600/90 dark:text-white/70">Nilai Stok</p>
+                                                    <p className="font-bold text-green-800 dark:text-white text-sm">
                                                         {formatRp(Number(item.initial_qty) > 0 ? (Number(item.buy_price) / Number(item.initial_qty)) * Number(item.stock) : 0)}
                                                     </p>
                                                 </div>
@@ -459,9 +461,9 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                             </div>
                                             <div className="flex justify-end gap-2 pt-1 border-t border-white/10">
                                                 <button type="button" onClick={() => openEditMaterial(item)}
-                                                    className="px-3 py-1.5 rounded-xl bg-blue-500/30 text-blue-800 text-xs font-semibold hover:bg-blue-500/50 transition">Edit</button>
+                                                    className="px-3 py-1.5 rounded-xl bg-blue-500/30 text-blue-800 dark:text-white text-xs font-semibold hover:bg-blue-500/50 transition">Edit</button>
                                                 <button type="button" onClick={() => router.delete(`/bahan/${item.id}`, { onSuccess: () => showNotif("success", "Bahan dihapus!") })}
-                                                    className="px-3 py-1.5 rounded-xl bg-red-500/30 text-red-800 text-xs font-semibold hover:bg-red-500/50 transition">Hapus</button>
+                                                    className="px-3 py-1.5 rounded-xl bg-red-500/30 text-red-800 dark:text-white text-xs font-semibold hover:bg-red-500/50 transition">Hapus</button>
                                             </div>
                                         </div>
                                     ))}
@@ -493,16 +495,16 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                                 {getInitials(user.name)}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-orange-800">{user.name}</p>
-                                                <p className="text-xs text-orange-800">{user.email}</p>
+                                                <p className="font-bold text-orange-800 dark:text-white">{user.name}</p>
+                                                <p className="text-xs text-orange-800 dark:text-white/70">{user.email}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="px-3 py-1 rounded-lg bg-orange-500/30 text-orange-800 text-xs font-semibold capitalize">
+                                            <span className="px-3 py-1 rounded-lg bg-orange-500/30 text-orange-800 dark:text-white text-xs font-semibold capitalize">
                                                 {user.roles.map((r) => r.name).join(", ")}
                                             </span>
                                             <button type="button" onClick={() => openEditUser(user)}
-                                                className="px-3 py-1.5 rounded-xl bg-blue-500/30 text-blue-800 text-xs font-semibold hover:bg-blue-500/50 transition">Edit</button>
+                                                className="px-3 py-1.5 rounded-xl bg-blue-500/30 text-blue-800 dark:text-white text-xs font-semibold hover:bg-blue-500/50 transition">Edit</button>
                                         </div>
                                     </div>
                                 ))}
@@ -574,6 +576,40 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                                     <input value={storeForm.data.phone}
                                         onChange={(e) => storeForm.setData("phone", e.target.value)}
                                         placeholder="08xxxxxxxxxx" className={inputCls} />
+                                </div>
+
+                                {/* QRIS Image Upload */}
+                                <div>
+                                    <label className={labelCls}>Gambar QRIS Toko</label>
+                                    <div
+                                        className="relative w-full h-48 rounded-xl overflow-hidden border border-white/30 bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20 transition"
+                                        onClick={() => document.getElementById('qris-input').click()}
+                                    >
+                                        {qrisPreview ? (
+                                            <>
+                                                <img src={qrisPreview} alt="QRIS" className="w-full h-full object-contain p-2" />
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                                                    <p className="text-white text-sm font-semibold">Ganti Gambar QRIS</p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-center text-white/50">
+                                                <CameraIcon className="w-8 h-8 mx-auto mb-1" />
+                                                <p className="text-xs">Klik untuk upload gambar QRIS</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <input id="qris-input" type="file" accept="image/*" className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                if (file.size > 2 * 1024 * 1024) { showNotif("error", "Ukuran gambar QRIS maksimal 2MB!"); return; }
+                                                storeForm.setData("qris_image", file);
+                                                setQrisPreview(URL.createObjectURL(file));
+                                            }
+                                        }}
+                                    />
+                                    <p className="text-xs text-white/40 mt-1">Screenshot QRIS dari bank/e-wallet toko (maks 2MB)</p>
                                 </div>
 
                                 {/* Invite Code — read only */}
@@ -668,22 +704,28 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
                     <button onClick={() => setShowMaterialModal(false)} className="px-5 py-2 rounded-xl bg-white/20 text-white hover:bg-white/30 transition text-sm">Batal</button>
                     <button onClick={saveMaterial} className="px-5 py-2 rounded-xl bg-white text-orange-500 font-semibold hover:bg-orange-50 transition text-sm">Simpan</button>
                 </>}>
-                <div><label className={labelCls}>Nama Bahan</label>
-                    <input value={data.name} onChange={(e) => setData("name", e.target.value)} placeholder="Nama Bahan" className={inputCls} /></div>
+                <div>
+                    <label className={labelCls}>Nama Bahan</label>
+                    <input value={data.name} onChange={(e) => setData("name", e.target.value)} placeholder="Nama Bahan" className={inputCls} />
+                    {errors.name && (
+                        <p className="mt-1.5 text-xs text-red-300 bg-red-500/20 border border-red-400/30 rounded-lg px-3 py-2">
+                            {errors.name}
+                        </p>
+                    )}
+                </div>
                 <div><label className={labelCls}>Satuan</label>
                     <CustomSelect value={data.unit} onChange={(v) => setData("unit", v)} options={unitOptions} /></div>
                 <div className="grid grid-cols-2 gap-3">
-                    <div><label className={labelCls}>Stok</label>
-                        <input type="number" value={data.stock} onChange={(e) => setData("stock", e.target.value)} placeholder="0" className={inputCls} /></div>
+                    <div>
+                        <label className={labelCls}>{editingMaterial ? "Stok" : "Stok Awal"}</label>
+                        <input type="number" value={data.stock} onChange={(e) => setData("stock", e.target.value)} placeholder="0" className={inputCls} />
+                        {!editingMaterial && <p className="text-white/40 text-xs mt-1">Otomatis jadi kuantitas awal</p>}
+                    </div>
                     <div><label className={labelCls}>Min Stok</label>
                         <input type="number" value={data.min_stock} onChange={(e) => setData("min_stock", e.target.value)} placeholder="0" className={inputCls} /></div>
                 </div>
                 <div><label className={labelCls}>Harga Beli</label>
                     <input type="number" value={data.buy_price} onChange={(e) => setData("buy_price", e.target.value)} placeholder="0" className={inputCls} /></div>
-                <label className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-3 cursor-pointer">
-                    <input type="checkbox" checked={data.use_initial_qty} onChange={(e) => setData("use_initial_qty", e.target.checked)} className="w-4 h-4 accent-orange-500" />
-                    <span className="text-sm text-white/80">Gunakan stok ini sebagai kuantitas awal</span>
-                </label>
             </Modal>
 
             {/* MODAL PENGGUNA */}

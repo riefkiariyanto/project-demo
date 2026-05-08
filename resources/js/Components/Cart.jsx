@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 
-export default function Cart({ cart, open, setOpen, setCart }) {
+export default function Cart({ cart, open, setOpen, setCart, qrisImage = null }) {
     const scrollRef = useRef();
 
     const [isDown, setIsDown] = useState(false);
@@ -139,9 +139,10 @@ export default function Cart({ cart, open, setOpen, setCart }) {
     // HANDLE PAY
     // =========================
     const handlePay = async () => {
-        const paid = Number(paidAmount) || 0;
+        const isQris = payment === "QRIS";
+        const paid = isQris ? total : Number(paidAmount) || 0;
 
-        if (paid < total) {
+        if (!isQris && paid < total) {
             setNotification({
                 type: "error",
                 title: "Pembayaran Kurang!",
@@ -344,8 +345,8 @@ export default function Cart({ cart, open, setOpen, setCart }) {
                 )}
             </div>
 
-            {/* PAYMENT INPUT MODAL */}
-            {showPaymentModal && (
+            {/* PAYMENT MODAL — CASH / DEBIT */}
+            {showPaymentModal && payment !== "QRIS" && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
                     <div className="bg-[#1f2937] rounded-2xl p-6 w-full max-w-md text-white space-y-4 shadow-2xl">
                         <h3 className="text-xl font-bold">Input Pembayaran</h3>
@@ -400,6 +401,61 @@ export default function Cart({ cart, open, setOpen, setCart }) {
                                 className="flex-1 px-4 py-2 rounded-xl bg-orange-500 text-white hover:bg-orange-600 transition disabled:opacity-50 font-semibold"
                             >
                                 {processing ? "Memproses..." : "Bayar"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* PAYMENT MODAL — QRIS */}
+            {showPaymentModal && payment === "QRIS" && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
+                    <div className="bg-[#1f2937] rounded-2xl p-6 w-full max-w-sm text-white space-y-4 shadow-2xl">
+                        <div className="text-center">
+                            <h3 className="text-xl font-bold">Bayar via QRIS</h3>
+                            <p className="text-sm text-gray-400 mt-1">Scan QR di bawah dengan e-wallet</p>
+                        </div>
+
+                        {/* QR Code */}
+                        <div className="flex justify-center">
+                            {qrisImage ? (
+                                <img
+                                    src={`/storage/${qrisImage}`}
+                                    alt="QRIS"
+                                    className="w-56 h-56 object-contain rounded-xl border-4 border-white bg-white"
+                                />
+                            ) : (
+                                <div className="w-56 h-56 rounded-xl border-2 border-dashed border-gray-600 flex flex-col items-center justify-center gap-2 text-gray-500">
+                                    <span className="text-5xl">📷</span>
+                                    <p className="text-xs text-center px-4">QR belum diupload. Upload di Kelola Toko → Toko</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Total */}
+                        <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl p-3 text-center">
+                            <p className="text-xs text-gray-400">Total yang harus dibayar</p>
+                            <p className="text-2xl font-bold text-orange-400">{formatCurrency(total)}</p>
+                        </div>
+
+                        <p className="text-xs text-gray-500 text-center">
+                            Setelah customer membayar, klik konfirmasi
+                        </p>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowPaymentModal(false)}
+                                disabled={processing}
+                                className="flex-1 px-4 py-2 rounded-xl bg-gray-700 text-white hover:bg-gray-600 transition disabled:opacity-50"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handlePay}
+                                disabled={processing}
+                                className="flex-1 px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-50 font-semibold"
+                            >
+                                {processing ? "Memproses..." : "Konfirmasi Diterima"}
                             </button>
                         </div>
                     </div>

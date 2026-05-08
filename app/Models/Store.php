@@ -10,8 +10,8 @@ class Store extends Model
     use HasFactory;
 
     protected $fillable = [
-    'name', 'code', 'address', 'phone', 'is_active', 'invite_code','logo',
-];
+        'name', 'code', 'address', 'phone', 'is_active', 'invite_code', 'logo', 'qris_image',
+    ];
 
 // Auto generate invite code
 protected static function booted()

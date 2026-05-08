@@ -12,6 +12,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\Auth\StoreRegistrationController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -31,9 +32,7 @@ Route::middleware(['auth', 'role:superadmin|admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/dashboard', function () {
-        return inertia('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'user'])->name('dashboard');
 });
 
 // Tambahkan ini jika belum ada
