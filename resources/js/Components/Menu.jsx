@@ -25,7 +25,6 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
         if (!isDown) return;
         const el = scrollRef.current;
         if (!el) return;
-        e.preventDefault();
         const walk = (e.pageY - startY) * 0.8;
         el.scrollTop = scrollTop - walk;
     };
@@ -66,7 +65,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
     };
 
     return (
-        <div className="w-full min-w-[280px] bg-white/30 backdrop-blur-xl rounded-2xl p-1 border border-white/30 h-full min-h-0 flex flex-col">
+        <div className="w-full bg-white/30 backdrop-blur-xl rounded-2xl px-1 py-1 border border-white/20 h-full min-h-0 flex flex-col">
             {/* HEADER */}
             <div className="flex px-2 justify-between items-center mb-2">
                 <h2 className="text-xl font-bold text-white">Semua menu</h2>
@@ -90,11 +89,11 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
             {/* SCROLL AREA */}
             <div
                 ref={scrollRef}
-                onMouseDown={(e) => { e.preventDefault(); handleMouseDown(e); }}
+                onMouseDown={handleMouseDown}
                 onMouseUp={stopDrag}
                 onMouseLeave={stopDrag}
                 onMouseMove={handleMouseMove}
-                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar cursor-grab active:cursor-grabbing select-none overscroll-contain"
+                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar cursor-grab active:cursor-grabbing overscroll-contain"
             >
                 <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0">
                     {filteredProducts.length > 0 ? (
