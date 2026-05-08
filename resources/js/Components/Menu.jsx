@@ -93,7 +93,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                 onMouseUp={stopDrag}
                 onMouseLeave={stopDrag}
                 onMouseMove={handleMouseMove}
-                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar cursor-grab active:cursor-grabbing overscroll-contain"
+                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar cursor-grab active:cursor-grabbing overscroll-contain touch-pan-y"
             >
                 <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0">
                     {filteredProducts.length > 0 ? (
