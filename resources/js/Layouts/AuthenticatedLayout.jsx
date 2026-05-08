@@ -12,6 +12,7 @@ import { Link, usePage } from "@inertiajs/react";
 import Sidebar from "@/Components/Sidebar";
 import SearchBar from "@/Components/SearchBar";
 import { useDarkMode } from "@/hooks/useDarkMode";
+import PageTransition from "@/Components/PageTransition";
 
 export default function AuthenticatedLayout({ header, children, openCart, hideSearch = false }) {
     const [search, setSearch] = useState("");
@@ -124,7 +125,9 @@ export default function AuthenticatedLayout({ header, children, openCart, hideSe
 
                 {/* MAIN */}
                 <main className={`flex-1 overflow-auto px-0 pt-1 ${isMobile ? "pb-20" : "pb-4"}`}>
-                    {children}
+                    <PageTransition keyProp={currentUrl}>
+                        {children}
+                    </PageTransition>
                 </main>
 
                 {/* ── MOBILE BOTTOM NAV ─────────────────────────────── */}
@@ -148,7 +151,7 @@ export default function AuthenticatedLayout({ header, children, openCart, hideSe
                                             relative flex items-center justify-center
                                             w-12 h-12 rounded-full transition-all duration-300
                                             ${active
-                                                ? "bg-white shadow-[0_4px_16px_rgba(255,115,0,0.25)] -translate-y-3 scale-105"
+                                                ? `bg-white -translate-y-3 scale-105 ${isDark ? "shadow-[0_4px_16px_rgba(255,115,0,0.2)]" : "shadow-[0_4px_20px_rgba(255,115,0,0.35)]"}`
                                                 : "bg-transparent"}
                                         `}
                                     >
@@ -163,7 +166,7 @@ export default function AuthenticatedLayout({ header, children, openCart, hideSe
                                         <span className={`
                                             absolute -bottom-4 text-[10px] font-semibold
                                             whitespace-nowrap transition-all duration-300
-                                            ${active ? "opacity-100 text-orange-500" : "opacity-0"}
+                                            ${active ? "opacity-100 text-orange-500" : "opacity-0 pointer-events-none"}
                                         `}>
                                             {item.name}
                                         </span>

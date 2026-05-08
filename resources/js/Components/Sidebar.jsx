@@ -100,9 +100,9 @@ export default function Sidebar({ open, setOpen, isDark}) {
                     const isActive = url.startsWith(item.link);
                     return (
                         <Link key={i} href={item.link}>
-                            <div className={`relative group flex items-center rounded-lg cursor-pointer transition-all duration-300 
+                            <div className={`relative group flex items-center rounded-lg cursor-pointer transition-all duration-300
                                 ${open ? "gap-3 px-3 py-4 justify-start" : "justify-center p-3"}
-                                ${isActive ? "bg-white text-orange-500 font-semibold" : "hover:bg-white/20"}`}
+                                ${isActive ? "bg-white text-orange-500 font-semibold shadow-md" : "hover:bg-white/20 hover:translate-x-1"}`}
                             >
                                 <item.icon className="h-5 w-5" />
                                 <span className={`whitespace-nowrap transition-all duration-300 ${open ? "opacity-100 ml-1" : "opacity-0 w-0 overflow-hidden"}`}>

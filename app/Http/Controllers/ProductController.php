@@ -78,7 +78,6 @@ class ProductController extends Controller
 
     // 🔥 Handle image upload
     if ($request->hasFile('image')) {
-        // Hapus gambar lama kalau ada
         if ($product->image) {
             \Storage::disk('public')->delete($product->image);
         }
