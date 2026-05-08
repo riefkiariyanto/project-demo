@@ -109,9 +109,10 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                     "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.getAttribute("content"),
                 },
                 body: JSON.stringify({
-                    items: cart.map((item) => ({ product_id: item.id, qty: item.qty })),
+                    items: cart.map((item) => ({ product_id: item.id, qty: item.qty, price: item.price })),
                     payment_method: payment,
                     paid_amount: paid,
+                    subtotal: total,
                 }),
             });
 
