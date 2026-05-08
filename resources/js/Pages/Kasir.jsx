@@ -28,7 +28,7 @@ export default function Kasir({ products = [], categories = [], qris_image = nul
         <AuthenticatedLayout hideSearch openCart={openCart}>
             <Head title="Kasir" />
 
-            <div className="flex gap-1 h-full overflow-hidden px-1">
+            <div className="flex gap-1 h-full overflow-hidden px-1" style={{ touchAction: 'pan-y' }}>
 
                 {/* MENU — full width on mobile, shrinks on desktop when cart open */}
                 <div className="flex-1 min-w-0 min-h-0 px-0">

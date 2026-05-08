@@ -58,13 +58,17 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
             />
 
             {/* SCROLL AREA */}
-            <div className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar overscroll-contain touch-pan-y">
-                <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0 touch-pan-y">
+            <div
+                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar overscroll-contain"
+                style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+            >
+                <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0">
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className="bg-white/40 backdrop-blur-md rounded-2xl p-2 shadow-lg hover:scale-105 transition flex flex-col touch-pan-y"
+                                className="bg-white/40 backdrop-blur-md rounded-2xl p-2 shadow-lg hover:scale-105 transition flex flex-col"
+                                style={{ touchAction: 'pan-y' }}
                             >
                                 {/* IMAGE */}
                                 <div className="relative aspect-square flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500 rounded-xl text-white text-2xl font-bold overflow-hidden">
@@ -105,6 +109,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                                         selling_price: product.selling_price,
                                     })}
                                     disabled={product.available_stock <= 0}
+                                    style={{ touchAction: 'manipulation' }}
                                     className={`mt-2 w-full py-1.5 rounded-lg text-xs font-semibold transition ${
                                         product.available_stock > 0
                                             ? "bg-orange-500 text-white hover:bg-orange-600"
