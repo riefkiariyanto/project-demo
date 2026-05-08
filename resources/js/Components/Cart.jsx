@@ -67,6 +67,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
     // =========================
     // SWIPE CLOSE (MOBILE)
     // =========================
+    // desktop side-panel swipe (horizontal)
     const touchStartX = useRef(0);
     const [dragX, setDragX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -78,23 +79,54 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
 
     const handleTouchMove = (e) => {
         if (!isDragging) return;
-
         const diff = e.touches[0].clientX - touchStartX.current;
         if (diff > 0) setDragX(diff);
     };
 
     const handleTouchEnd = () => {
         setIsDragging(false);
-
         if (dragX > 120) setOpen(false);
         setDragX(0);
+    };
+
+    // mobile bottom-sheet: two-position drag (half ↔ full, close on drag down from half)
+    const touchStartY = useRef(0);
+    const [dragY, setDragY] = useState(0);       // live drag offset (px), positive = down
+    const [sheetFull, setSheetFull] = useState(false); // false = half, true = full
+    const [isDraggingY, setIsDraggingY] = useState(false);
+
+    const handleSheetTouchStart = (e) => {
+        touchStartY.current = e.touches[0].clientY;
+        setIsDraggingY(true);
+    };
+
+    const handleSheetTouchMove = (e) => {
+        if (!isDraggingY) return;
+        const diff = e.touches[0].clientY - touchStartY.current;
+        // full mode: allow drag down; half mode: allow drag in both directions
+        if (sheetFull) {
+            if (diff > 0) setDragY(diff);          // only drag down in full
+        } else {
+            setDragY(diff);                          // both up and down in half
+        }
+    };
+
+    const handleSheetTouchEnd = () => {
+        setIsDraggingY(false);
+        if (sheetFull) {
+            if (dragY > 100) setSheetFull(false);  // full → half
+        } else {
+            if (dragY < -60) setSheetFull(true);   // half → full (drag up)
+            else if (dragY > 100) setOpen(false);  // half → close (drag down)
+        }
+        setDragY(0);
     };
 
     // =========================
     // AUTO CLOSE IF EMPTY
     // =========================
     useEffect(() => {
-        if (cart.length === 0) setOpen(false);
+        if (cart.length === 0) { setOpen(false); setSheetFull(false); }
     }, [cart]);
 
     // =========================
@@ -225,11 +257,15 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                             onClick={() => setOpen(false)}
                         />
                         <div
-                            style={{ transform: `translateY(${dragX > 0 ? dragX : 0}px)` }}
-                            className="relative flex flex-col bg-gradient-to-b from-orange-400 to-orange-500 text-white rounded-t-3xl shadow-2xl max-h-[85vh]"
-                            onTouchStart={handleTouchStart}
-                            onTouchMove={handleTouchMove}
-                            onTouchEnd={handleTouchEnd}
+                            style={{
+                                transform: `translateY(${dragY > 0 ? dragY : 0}px)`,
+                                transition: isDraggingY ? "none" : "transform 0.3s ease, height 0.3s ease, max-height 0.3s ease",
+                            }}
+                            className={`relative flex flex-col bg-gradient-to-b from-orange-400 to-orange-500 text-white rounded-t-3xl shadow-2xl
+                                ${sheetFull ? "h-[92vh]" : "max-h-[60vh]"}`}
+                            onTouchStart={handleSheetTouchStart}
+                            onTouchMove={handleSheetTouchMove}
+                            onTouchEnd={handleSheetTouchEnd}
                         >
                             {/* drag handle */}
                             <div className="flex justify-center pt-3 pb-1">
@@ -266,7 +302,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                             </div>
 
                             {/* FOOTER */}
-                            <div className="p-4 border-t border-white/20 space-y-3">
+                            <div className="p-4 pb-24 border-t border-white/20 space-y-3">
                                 <div className="space-y-2">
                                     <p className="text-sm font-semibold">Metode Pembayaran</p>
                                     <div className="flex gap-2">
