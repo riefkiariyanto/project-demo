@@ -1,39 +1,10 @@
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import ListCategoryMenu from "@/Components/ListCategoryMenu";
 
 export default function Menu({ onAdd, openCart, products = [], categories = [] }) {
-    const scrollRef = useRef();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [search, setSearch] = useState("");
-
-    const [isDown, setIsDown] = useState(false);
-    const [startY, setStartY] = useState(0);
-    const [scrollTop, setScrollTop] = useState(0);
-
-    const handleMouseDown = (e) => {
-        const el = scrollRef.current;
-        if (!el) return;
-        setIsDown(true);
-        setStartY(e.pageY);
-        setScrollTop(el.scrollTop);
-    };
-
-    const stopDrag = () => setIsDown(false);
-
-    const handleMouseMove = (e) => {
-        if (!isDown) return;
-        const el = scrollRef.current;
-        if (!el) return;
-        const walk = (e.pageY - startY) * 0.8;
-        el.scrollTop = scrollTop - walk;
-    };
-
-    useEffect(() => {
-        const handleUp = () => setIsDown(false);
-        window.addEventListener("mouseup", handleUp);
-        return () => window.removeEventListener("mouseup", handleUp);
-    }, []);
 
     const filteredProducts = useMemo(() => {
         let result = products;
@@ -87,14 +58,7 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
             />
 
             {/* SCROLL AREA */}
-            <div
-                ref={scrollRef}
-                onMouseDown={handleMouseDown}
-                onMouseUp={stopDrag}
-                onMouseLeave={stopDrag}
-                onMouseMove={handleMouseMove}
-                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar overscroll-contain touch-pan-y"
-            >
+            <div className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar overscroll-contain touch-pan-y">
                 <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0 touch-pan-y">
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
