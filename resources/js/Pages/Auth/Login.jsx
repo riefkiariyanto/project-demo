@@ -3,7 +3,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { Mail, Lock } from "lucide-react";
+import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 
 export default function Login({ status, canResetPassword }) {
@@ -138,7 +138,7 @@ export default function Login({ status, canResetPassword }) {
                         <div>
                             <InputLabel value="Email" />
                             <div className="relative mt-1">
-                                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type="email"
                                     value={data.email}
@@ -154,7 +154,7 @@ export default function Login({ status, canResetPassword }) {
                         <div>
                             <InputLabel value="Password" />
                             <div className="relative mt-1">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
 
                                 <TextInput
                                     type={showPassword ? "text" : "password"}

@@ -3,7 +3,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { User, Mail, Lock, Store, KeyRound } from "lucide-react";
+import { UserIcon, EnvelopeIcon, LockClosedIcon, BuildingStorefrontIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 export default function Register() {
@@ -91,7 +91,7 @@ export default function Register() {
                                     ? "bg-orange-600 text-white"
                                     : "text-gray-400 hover:text-white"}`}
                         >
-                            <Store className="w-4 h-4" />
+                            <BuildingStorefrontIcon className="w-4 h-4" />
                             Daftar Toko
                         </button>
                         <button
@@ -102,7 +102,7 @@ export default function Register() {
                                     ? "bg-orange-600 text-white"
                                     : "text-gray-400 hover:text-white"}`}
                         >
-                            <KeyRound className="w-4 h-4" />
+                            <KeyIcon className="w-4 h-4" />
                             Punya Kode
                         </button>
                     </div>
@@ -116,7 +116,7 @@ export default function Register() {
                                 <div>
                                     <InputLabel value="Nama Toko" />
                                     <div className="relative mt-1">
-                                        <Store className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                        <BuildingStorefrontIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                         <TextInput
                                             type="text"
                                             value={data.store_name}
@@ -150,7 +150,7 @@ export default function Register() {
                             <div>
                                 <InputLabel value="Kode Toko" />
                                 <div className="relative mt-1">
-                                    <KeyRound className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                    <KeyIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                     <TextInput
                                         type="text"
                                         value={data.invite_code}
@@ -168,7 +168,7 @@ export default function Register() {
                         <div>
                             <InputLabel value="Nama Lengkap" />
                             <div className="relative mt-1">
-                                <User className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type="text"
                                     value={data.name}
@@ -185,7 +185,7 @@ export default function Register() {
                         <div>
                             <InputLabel value="Email" />
                             <div className="relative mt-1">
-                                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type="email"
                                     value={data.email}
@@ -202,7 +202,7 @@ export default function Register() {
                         <div>
                             <InputLabel value="Password" />
                             <div className="relative mt-1">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type={showPassword ? "text" : "password"}
                                     value={data.password}
@@ -222,7 +222,7 @@ export default function Register() {
                         <div>
                             <InputLabel value="Konfirmasi Password" />
                             <div className="relative mt-1">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type={showConfirm ? "text" : "password"}
                                     value={data.password_confirmation}
