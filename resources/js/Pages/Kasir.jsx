@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/react";
 import Menu from "@/Components/Menu";
 import Cart from "@/Components/Cart";
 
-export default function Kasir({ products = [], categories = [], qris_image = null }) {
+export default function Kasir({ products = [], categories = [], qris_image = null, store = null, kasir_name = "" }) {
     const [cart, setCart] = useState([]);
     const [openCart, setOpenCart] = useState(false);
     const isMobileRef = useRef(false);
@@ -56,6 +56,8 @@ export default function Kasir({ products = [], categories = [], qris_image = nul
                         setOpen={setOpenCart}
                         setCart={setCart}
                         qrisImage={qris_image}
+                        store={store}
+                        kasirName={kasir_name}
                     />
                 </div>
 
@@ -67,6 +69,8 @@ export default function Kasir({ products = [], categories = [], qris_image = nul
                         setOpen={setOpenCart}
                         setCart={setCart}
                         qrisImage={qris_image}
+                        store={store}
+                        kasirName={kasir_name}
                         isMobile
                     />
                 </div>

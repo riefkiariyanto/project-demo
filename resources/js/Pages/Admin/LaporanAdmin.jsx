@@ -314,17 +314,19 @@ function NotaModal({ sale, onClose, btState, onConnect }) {
 }
 
 // ─── KPI Card ─────────────────────────────────────────────────────────────────
-function KpiCard({ title, value, growth, icon: Icon, color, sub, loading }) {
+function KpiCard({ title, value, growth, icon: Icon, color, sub, loading, noGrowth, hint }) {
     const pos = growth >= 0;
     return (
         <div className={`relative overflow-hidden rounded-2xl p-5 border border-white/10 bg-gradient-to-br ${color}`}>
-            {/* Background decoration */}
             <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-white/5" />
             <div className="absolute -right-2 -top-2 w-10 h-10 rounded-full bg-white/5" />
 
             <div className="relative">
                 <div className="flex justify-between items-start mb-4">
-                    <p className="text-xs text-white/60 font-medium uppercase tracking-wider">{title}</p>
+                    <div>
+                        <p className="text-xs text-white/60 font-medium uppercase tracking-wider">{title}</p>
+                        {hint && <p className="text-[10px] text-white/40 mt-0.5">{hint}</p>}
+                    </div>
                     <div className="p-2 bg-white/10 rounded-xl">
                         <Icon className="w-4 h-4 text-white" />
                     </div>
@@ -332,18 +334,18 @@ function KpiCard({ title, value, growth, icon: Icon, color, sub, loading }) {
                 {loading ? (
                     <div className="h-8 w-32 bg-white/10 rounded-lg animate-pulse mb-2" />
                 ) : (
-                    <p className="text-2xl font-bold text-white mb-1 leading-none">{value}</p>
+                    <p className="text-xl font-bold text-white mb-1 leading-tight break-all">{value}</p>
                 )}
                 <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-white/40">{sub}</p>
-                    {loading ? (
+                    <p className="text-xs text-gray-400 dark:text-white/40">{sub}</p>
+                    {!noGrowth && (loading ? (
                         <div className="h-5 w-14 bg-white/10 rounded animate-pulse" />
                     ) : (
                         <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${pos ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
                             {pos ? <ArrowTrendingUpIcon className="w-3 h-3" /> : <ArrowTrendingDownIcon className="w-3 h-3" />}
                             {pos ? "+" : ""}{growth}%
                         </div>
-                    )}
+                    ))}
                 </div>
             </div>
         </div>
@@ -375,10 +377,10 @@ function SummarySection({ summary, bulan }) {
     const label = mode === "bulan" ? bulan : (harian?.label ?? tanggal);
 
     const cards = [
-        { title: "Total Pendapatan", value: data ? fmt(data.pendapatan) : "-", growth: data?.growthPendapatan ?? 0, icon: BanknotesIcon, color: "from-orange-600 to-orange-700" },
+        { title: "Pendapatan Kotor", value: data ? fmt(data.pendapatan) : "-", growth: data?.growthPendapatan ?? 0, icon: BanknotesIcon, color: "from-orange-600 to-orange-700" },
+        { title: "HPP", value: data ? fmt(data.hpp ?? 0) : "-", growth: 0, icon: CubeIcon, color: "from-slate-600 to-slate-700", noGrowth: true, hint: "Harga Pokok Penjualan" },
+        { title: "Pendapatan Bersih", value: data ? fmt(data.bersih ?? 0) : "-", growth: data?.growthBersih ?? 0, icon: ReceiptPercentIcon, color: "from-green-600 to-green-700" },
         { title: "Total Pesanan", value: data ? (data.pesanan ?? 0) : "-", growth: data?.growthPesanan ?? 0, icon: ShoppingCartIcon, color: "from-rose-600 to-rose-700" },
-        { title: "Item Terjual", value: data ? (data.itemTerjual ?? 0) : "-", growth: data?.growthItem ?? 0, icon: CubeIcon, color: "from-amber-600 to-amber-700" },
-        { title: "Avg. Transaksi", value: data && data.pesanan > 0 ? fmt(data.pendapatan / data.pesanan) : "-", growth: 0, icon: ReceiptPercentIcon, color: "from-teal-600 to-teal-700" },
     ];
 
     return (

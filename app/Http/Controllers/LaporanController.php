@@ -27,12 +27,28 @@ class LaporanController extends Controller
             ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $storeId))
             ->where('status', 'completed');
 
-        // Pendapatan
+        // Pendapatan Kotor
         $pendapatanIni  = (clone $base())->whereBetween('sale_date', [$startOfMonth, $endOfMonth])->sum('grand_total');
         $pendapatanLalu = (clone $base())->whereBetween('sale_date', [$startOfLastMonth, $endOfLastMonth])->sum('grand_total');
         $growthPendapatan = $pendapatanLalu > 0
             ? round((($pendapatanIni - $pendapatanLalu) / $pendapatanLalu) * 100, 1)
             : ($pendapatanIni > 0 ? 100 : 0);
+
+        // HPP (Harga Pokok Penjualan)
+        $hppBase = fn() => SaleItem::join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->when(!$isSuperadmin, fn($q) => $q->where('sales.store_id', $storeId))
+            ->where('sales.status', 'completed');
+
+        $hppIni  = (clone $hppBase())->whereBetween('sales.sale_date', [$startOfMonth, $endOfMonth])
+            ->sum(DB::raw('sale_items.cost_price * sale_items.qty'));
+        $hppLalu = (clone $hppBase())->whereBetween('sales.sale_date', [$startOfLastMonth, $endOfLastMonth])
+            ->sum(DB::raw('sale_items.cost_price * sale_items.qty'));
+
+        $bersihIni  = $pendapatanIni - $hppIni;
+        $bersihLalu = $pendapatanLalu - $hppLalu;
+        $growthBersih = $bersihLalu > 0
+            ? round((($bersihIni - $bersihLalu) / $bersihLalu) * 100, 1)
+            : ($bersihIni > 0 ? 100 : 0);
 
         // Pesanan
         $pesananIni  = (clone $base())->whereBetween('sale_date', [$startOfMonth, $endOfMonth])->count();
@@ -124,6 +140,9 @@ class LaporanController extends Controller
             'summary' => [
                 'pendapatan'       => (float) $pendapatanIni,
                 'growthPendapatan' => $growthPendapatan,
+                'hpp'              => (float) $hppIni,
+                'bersih'           => (float) $bersihIni,
+                'growthBersih'     => $growthBersih,
                 'pesanan'          => $pesananIni,
                 'growthPesanan'    => $growthPesanan,
                 'itemTerjual'      => (int) $itemIni,
@@ -184,9 +203,24 @@ class LaporanController extends Controller
             ? round((($itemIni - $itemLalu) / $itemLalu) * 100, 1)
             : ($itemIni > 0 ? 100 : 0);
 
+        // HPP harian
+        $hppHariIni  = (clone $itemBase())->whereBetween('sales.sale_date', [$hari, $hariAkhir])
+            ->sum(DB::raw('sale_items.cost_price * sale_items.qty'));
+        $hppHariLalu = (clone $itemBase())->whereBetween('sales.sale_date', [$hariLalu, $hariLaluAkhir])
+            ->sum(DB::raw('sale_items.cost_price * sale_items.qty'));
+
+        $bersihHariIni  = $pendapatanIni - $hppHariIni;
+        $bersihHariLalu = $pendapatanLalu - $hppHariLalu;
+        $growthBersihHari = $bersihHariLalu > 0
+            ? round((($bersihHariIni - $bersihHariLalu) / $bersihHariLalu) * 100, 1)
+            : ($bersihHariIni > 0 ? 100 : 0);
+
         return response()->json([
             'pendapatan'       => (float) $pendapatanIni,
             'growthPendapatan' => $growthPendapatan,
+            'hpp'              => (float) $hppHariIni,
+            'bersih'           => (float) $bersihHariIni,
+            'growthBersih'     => $growthBersihHari,
             'pesanan'          => $pesananIni,
             'growthPesanan'    => $growthPesanan,
             'itemTerjual'      => (int) $itemIni,

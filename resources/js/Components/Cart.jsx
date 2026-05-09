@@ -1,7 +1,131 @@
 import { useRef, useState, useEffect } from "react";
 import { ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
-export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, isMobile = false }) {
+function PrintModal({ data, onPrint, onClose, formatCurrency }) {
+    if (!data) return null;
+    return (
+        <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+                {/* Header */}
+                <div className="bg-green-500 px-6 py-5 text-white text-center">
+                    <div className="text-4xl mb-2">✓</div>
+                    <h2 className="text-xl font-bold">Pembayaran Berhasil!</h2>
+                    <p className="text-sm opacity-90 mt-1">{data.invoiceNo}</p>
+                </div>
+
+                {/* Summary */}
+                <div className="px-6 py-4 space-y-2 text-sm text-gray-700 dark:text-slate-300">
+                    <div className="flex justify-between">
+                        <span className="text-gray-500 dark:text-slate-400">Total</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(data.total)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-500 dark:text-slate-400">Metode</span>
+                        <span className="font-semibold">{data.payment}</span>
+                    </div>
+                    {data.payment !== "QRIS" && (
+                        <>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 dark:text-slate-400">Tunai</span>
+                                <span>{formatCurrency(data.paid)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 dark:text-slate-400">Kembalian</span>
+                                <span className="font-bold text-green-600 dark:text-green-400">{formatCurrency(data.change)}</span>
+                            </div>
+                        </>
+                    )}
+                    <div className="flex justify-between">
+                        <span className="text-gray-500 dark:text-slate-400">Item</span>
+                        <span>{data.items.reduce((s, i) => s + i.qty, 0)} item</span>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="px-6 pb-6 flex gap-3">
+                    <button onClick={onClose}
+                        className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition text-sm">
+                        Lewati
+                    </button>
+                    <button onClick={() => { onPrint(); onClose(); }}
+                        className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2">
+                        🖨️ Cetak Nota
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function buildReceiptHTML({ store, kasirName, invoiceNo, saleDate, items, total, payment, paid, change }) {
+    const fmt = (v) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(v || 0);
+    const logoHtml = store?.logo
+        ? `<img src="/storage/${store.logo}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:6px;" />`
+        : "";
+    const itemsHtml = items.map(item => `
+        <div class="item">
+            <div class="item-name">${item.name}</div>
+            <div class="item-detail">
+                <span>${item.qty} x ${fmt(item.price)}</span>
+                <span>${fmt(item.price * item.qty)}</span>
+            </div>
+        </div>`).join("");
+
+    const cashRows = payment !== "QRIS" ? `
+        <div class="row"><span>Tunai</span><span>${fmt(paid)}</span></div>
+        <div class="row"><span>Kembali</span><span>${fmt(change)}</span></div>` : "";
+
+    return `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<title>Nota ${invoiceNo}</title>
+<style>
+  body { font-family: monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }
+  .center { text-align: center; }
+  .store-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+  .store-sub { font-size: 11px; margin-bottom: 8px; line-height: 1.5; }
+  .divider { border-top: 1px dashed #000; margin: 8px 0; }
+  .item { margin-bottom: 8px; }
+  .item-name { font-weight: bold; font-size: 13px; }
+  .item-detail { display: flex; justify-content: space-between; font-size: 12px; }
+  .total-section { font-size: 13px; }
+  .row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .grand-total { font-size: 15px; font-weight: bold; }
+  .footer { text-align: center; margin-top: 14px; font-size: 11px; }
+  .info { font-size: 11px; line-height: 1.7; }
+  @media print { body { width: 100%; } }
+</style>
+</head>
+<body>
+  <div class="center">
+    ${logoHtml}
+    <div class="store-name">${store?.name ?? "Toko"}</div>
+    <div class="store-sub">${store?.address ?? ""}<br>${store?.phone ?? ""}</div>
+  </div>
+  <div class="divider"></div>
+  <div class="info">
+    <div>No Transaksi : ${invoiceNo}</div>
+    <div>Tanggal      : ${saleDate}</div>
+    <div>Kasir        : ${kasirName}</div>
+    <div>Pembayaran   : ${payment}</div>
+  </div>
+  <div class="divider"></div>
+  ${itemsHtml}
+  <div class="divider"></div>
+  <div class="total-section">
+    <div class="row"><span>Subtotal</span><span>${fmt(total)}</span></div>
+    <div class="row grand-total"><span>Total</span><span>${fmt(total)}</span></div>
+    ${cashRows}
+  </div>
+  <div class="divider"></div>
+  <div class="footer">Terima kasih telah berkunjung 🙏</div>
+  <script>window.onload = () => { window.print(); window.onafterprint = () => window.close(); }</script>
+</body>
+</html>`;
+}
+
+export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, isMobile = false, store = null, kasirName = "" }) {
     const scrollRef = useRef();
 
     const [isDown, setIsDown] = useState(false);
@@ -15,6 +139,8 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
     const [orderId, setOrderId] = useState("");
     const [notification, setNotification] = useState(null);
     const [processing, setProcessing] = useState(false);
+    const [showPrintModal, setShowPrintModal] = useState(false);
+    const [lastSaleData, setLastSaleData] = useState(null);
 
     useEffect(() => {
         if (notification) {
@@ -119,21 +245,26 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
             const data = await response.json();
 
             if (data.success) {
-                setOrderId(data.invoice_no ?? "");
-                setNotification({
-                    type: "success",
-                    title: "Pembayaran Berhasil!",
-                    message: `Kembalian: ${formatCurrency(data.change)}`,
-                    invoice: data.invoice_no,
+                const now = new Date();
+                const saleDate = now.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" })
+                    + " " + now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+                setLastSaleData({
+                    invoiceNo: data.invoice_no ?? "",
+                    saleDate,
+                    items: [...cart],
+                    total,
+                    payment,
+                    paid,
+                    change: data.change ?? 0,
                 });
-                setTimeout(() => {
-                    setCart([]);
-                    setOrderId("");
-                    setPayment("Cash");
-                    setPaidAmount("");
-                    setShowPaymentModal(false);
-                    setOpen(false);
-                }, 1500);
+                setShowPaymentModal(false);
+                setShowPrintModal(true);
+                setCart([]);
+                setOrderId("");
+                setPayment("Cash");
+                setPaidAmount("");
+                setOpen(false);
             } else {
                 setNotification({ type: "error", title: "Pembayaran Gagal!", message: data.message || "Terjadi kesalahan, coba lagi" });
             }
@@ -142,6 +273,19 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
         } finally {
             setProcessing(false);
         }
+    };
+
+    const handlePrintNota = () => {
+        if (!lastSaleData) return;
+        const html = buildReceiptHTML({ store, kasirName, ...lastSaleData });
+        const w = window.open("", "_blank", "width=380,height=600");
+        w.document.write(html);
+        w.document.close();
+    };
+
+    const closePrintModal = () => {
+        setShowPrintModal(false);
+        setLastSaleData(null);
     };
 
     // ──────────────────────────────────────────────────────────────
@@ -325,6 +469,9 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                         </div>
                     </div>
                 )}
+
+                {/* PRINT MODAL */}
+                {showPrintModal && <PrintModal data={lastSaleData} onPrint={handlePrintNota} onClose={closePrintModal} formatCurrency={formatCurrency} />}
             </>
         );
     }
@@ -490,6 +637,9 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                     </div>
                 </div>
             )}
+
+            {/* PRINT MODAL */}
+            {showPrintModal && <PrintModal data={lastSaleData} onPrint={handlePrintNota} onClose={closePrintModal} formatCurrency={formatCurrency} />}
         </>
     );
 }
