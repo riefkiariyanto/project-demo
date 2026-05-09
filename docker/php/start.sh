@@ -30,7 +30,8 @@ php artisan optimize
 echo "✅ Setup complete!"
 
 # Configure nginx port
-PORT=${PORT:-80}
+export PORT=${PORT:-80}
 echo "🌐 Configuring nginx on port $PORT..."
 envsubst '${PORT}' < /etc/nginx/conf.d/default.conf > /tmp/nginx.conf
 cp /tmp/nginx.conf /etc/nginx/conf.d/default.conf
+echo "✅ Nginx will listen on port $PORT"
