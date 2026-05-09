@@ -12,6 +12,7 @@ import {
     ClockIcon, FireIcon, SignalIcon,
 } from "@heroicons/react/24/solid";
 import axios from "axios";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (v) =>
@@ -770,6 +771,7 @@ export default function LaporanAdmin({
     summary = {}, chartData = [], kalenderData = [],
     mostOrder = [], riwayat = [], bulan = ""
 }) {
+    const { isDark } = useDarkMode();
     const [selectedSale, setSelectedSale] = useState(null);
     const [btState, setBtState] = useState({ connected: false, loading: false, name: null });
 
