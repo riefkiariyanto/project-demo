@@ -63,9 +63,11 @@ class SaleController extends Controller
 
     // Hitung HPP: dari resep jika ada, fallback ke cost_price produk
     if ($product->recipe && $product->recipe->items->isNotEmpty()) {
-        $costPrice = $product->recipe->items->sum(
-            fn($ri) => ($ri->material?->buy_price ?? 0) * $ri->qty
-        );
+        $costPrice = $product->recipe->items->sum(function ($ri) {
+            $material = $ri->material;
+            if (!$material || $material->initial_qty <= 0) return 0;
+            return ($material->buy_price / $material->initial_qty) * $ri->qty;
+        });
     } else {
         $costPrice = (float) $product->cost_price;
     }
