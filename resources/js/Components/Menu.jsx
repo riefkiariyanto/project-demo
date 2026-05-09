@@ -84,8 +84,9 @@ export default function Menu({ onAdd, openCart, setOpenCart, cart = [], products
                         filteredProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className={`rounded-2xl p-2 shadow-sm hover:scale-105 transition flex flex-col border ${isDark ? "bg-slate-700 border-slate-600" : "bg-white border-gray-100"}`}
-                                style={{ touchAction: 'pan-y' }}
+                                onClick={() => product.available_stock > 0 && onAdd({ id: product.id, name: product.name, price: product.selling_price, selling_price: product.selling_price })}
+                                className={`rounded-2xl p-2 shadow-sm hover:scale-105 transition flex flex-col border ${isDark ? "bg-slate-700 border-slate-600" : "bg-white border-gray-100"} ${product.available_stock > 0 ? "cursor-pointer" : "cursor-not-allowed opacity-70"}`}
+                                style={{ touchAction: 'manipulation' }}
                             >
                                 {/* IMAGE */}
                                 <div className="relative aspect-square flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500 rounded-xl text-white text-2xl font-bold overflow-hidden">
@@ -119,12 +120,7 @@ export default function Menu({ onAdd, openCart, setOpenCart, cart = [], products
 
                                 {/* BUTTON */}
                                 <button
-                                    onClick={() => onAdd({
-                                        id: product.id,
-                                        name: product.name,
-                                        price: product.selling_price,
-                                        selling_price: product.selling_price,
-                                    })}
+                                    onClick={(e) => { e.stopPropagation(); product.available_stock > 0 && onAdd({ id: product.id, name: product.name, price: product.selling_price, selling_price: product.selling_price }); }}
                                     disabled={product.available_stock <= 0}
                                     style={{ touchAction: 'manipulation' }}
                                     className={`mt-2 w-full py-1.5 rounded-lg text-xs font-semibold transition ${

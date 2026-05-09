@@ -23,9 +23,9 @@ function StatCard({ icon: Icon, label, value, growth, color = "orange" }) {
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${colorMap[color]} flex items-center justify-center shadow`}>
                 <Icon className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
                 <p className="text-xs text-gray-500 dark:text-slate-400">{label}</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{value}</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white mt-0.5 break-all leading-tight">{value}</p>
             </div>
             {growth !== undefined && (
                 <div className={`flex items-center gap-1 text-xs font-semibold ${isUp ? "text-green-300" : "text-red-300"}`}>
