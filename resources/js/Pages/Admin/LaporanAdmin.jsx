@@ -477,7 +477,7 @@ function RevenueTrend({ chartData }) {
         })), [chartData]);
 
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white">
             <div className="flex justify-between items-center mb-5">
                 <div>
                     <h3 className="font-semibold text-base">Tren Pendapatan</h3>
@@ -534,7 +534,7 @@ function PaymentMix({ riwayat }) {
     }, [riwayat]);
 
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white">
             <div className="mb-4">
                 <h3 className="font-semibold text-base">Metode Pembayaran</h3>
                 <p className="text-xs text-gray-400 dark:text-white/40 mt-0.5">Distribusi transaksi</p>
@@ -580,7 +580,7 @@ function KalenderPenjualan({ kalenderData }) {
     };
 
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white">
             <div className="flex justify-between items-center mb-4">
                 <div>
                     <h3 className="font-semibold">Kalender Penjualan</h3>
@@ -624,7 +624,7 @@ function KalenderPenjualan({ kalenderData }) {
 function MostOrder({ orders }) {
     const maxQty = orders[0]?.total || 1;
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white">
             <div className="flex justify-between items-center mb-5">
                 <div>
                     <h3 className="font-semibold">Produk Terlaris</h3>
@@ -675,7 +675,7 @@ function JamSibuk({ riwayat }) {
     const peak = data.reduce((a, b) => a.count > b.count ? a : b, { jam: "-", count: 0 });
 
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white">
             <div className="flex justify-between items-center mb-4">
                 <div>
                     <h3 className="font-semibold">Jam Tersibuk</h3>
@@ -720,7 +720,7 @@ function RiwayatPesanan({ riwayat, onPrint }) {
     }[m] || "bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white/50 border-gray-200 dark:border-white/10");
 
     return (
-        <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-5 text-gray-900 dark:text-white flex flex-col" style={{ height: 480 }}>
+        <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-5 text-gray-900 dark:text-white flex flex-col" style={{ height: 480 }}>
             <div className="flex justify-between items-center mb-3">
                 <div>
                     <h3 className="font-semibold">Riwayat Transaksi</h3>
@@ -729,7 +729,7 @@ function RiwayatPesanan({ riwayat, onPrint }) {
                 <div className="flex gap-1">
                     {payments.map(p => (
                         <button key={p} onClick={() => setFilterPayment(p)}
-                            className={`text-xs px-2 py-1 rounded-lg transition border ${filterPayment === p ? "bg-orange-500 border-orange-500 text-white font-semibold" : "border-gray-200 dark:border-white/10 text-gray-500 dark:text-white/40 hover:text-gray-900 dark:hover:text-white"}`}>
+                            className={`text-xs px-2 py-1 rounded-lg transition border ${filterPayment === p ? "bg-orange-500 border-orange-500 text-white font-semibold" : "border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white"}`}>
                             {p}
                         </button>
                     ))}
@@ -737,12 +737,12 @@ function RiwayatPesanan({ riwayat, onPrint }) {
             </div>
             <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Cari no. invoice..."
-                className="w-full mb-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/30 text-xs focus:outline-none focus:border-orange-500 transition" />
+                className="w-full mb-3 px-3 py-2 rounded-xl bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-400 text-xs focus:outline-none focus:border-orange-500 transition" />
 
             <div className="flex-1 overflow-y-auto space-y-2 pr-1" style={{ scrollbarWidth: "none" }}>
                 {filtered.length > 0 ? filtered.map(order => (
                     <div key={order.id} onClick={() => onPrint(order)}
-                        className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-white/3 hover:bg-gray-100 dark:hover:bg-white/8 border border-gray-100 dark:border-white/5 hover:border-orange-300 dark:hover:border-orange-500/30 transition rounded-xl cursor-pointer group">
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-100 dark:border-slate-600 hover:border-orange-300 dark:hover:border-orange-500/50 transition rounded-xl cursor-pointer group">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {order.invoice_no.slice(-3)}
                         </div>
