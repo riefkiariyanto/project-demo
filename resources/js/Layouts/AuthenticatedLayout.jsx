@@ -102,9 +102,7 @@ export default function AuthenticatedLayout({ header, children, openCart, hideSe
                 {/* DESKTOP SEARCH */}
                 {!hideSearch && !isMobile && (
                     <div className="px-4 pt-2 shrink-0">
-                        <div className={`transition-all duration-300 ${openCart ? "mr-[320px]" : "mr-0"}`}>
-                            <SearchBar onSearch={setSearch} isDark={isDark} />
-                        </div>
+                        <SearchBar onSearch={setSearch} isDark={isDark} />
                     </div>
                 )}
 

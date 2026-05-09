@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon, ShoppingCartIcon } from "@heroicons/react/24/solid";
 import ListCategoryMenu from "@/Components/ListCategoryMenu";
 
 import { useDarkMode } from "@/hooks/useDarkMode";
 
-export default function Menu({ onAdd, openCart, products = [], categories = [] }) {
+export default function Menu({ onAdd, openCart, setOpenCart, cart = [], products = [], categories = [] }) {
     const { isDark } = useDarkMode();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [search, setSearch] = useState("");
@@ -41,9 +41,9 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
     return (
         <div className={`w-full rounded-2xl px-1 py-1 border h-full min-h-0 flex flex-col ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200 shadow-sm"}`}>
             {/* HEADER */}
-            <div className="flex px-2 justify-between items-center mb-2">
-                <h2 className={`text-xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Semua menu</h2>
-                <div className={`flex items-center rounded-full px-2 py-1 ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
+            <div className="flex px-2 justify-between items-center mb-2 gap-2">
+                <h2 className={`text-xl font-bold shrink-0 ${isDark ? "text-white" : "text-gray-900"}`}>Semua menu</h2>
+                <div className={`flex items-center rounded-full px-2 py-1 flex-1 ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
                     <input
                         placeholder="Search menu..."
                         value={search}
@@ -52,6 +52,20 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                     />
                     <MagnifyingGlassIcon className="w-6 h-6 text-orange-500 drop-shadow-sm" />
                 </div>
+                {/* Cart toggle — desktop only */}
+                {setOpenCart && (
+                    <button
+                        onClick={() => setOpenCart(!openCart)}
+                        className="hidden sm:flex relative shrink-0 items-center justify-center w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 text-white transition"
+                    >
+                        <ShoppingCartIcon className="w-5 h-5" />
+                        {cart.length > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 bg-white text-orange-500 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                {cart.reduce((s, i) => s + i.qty, 0)}
+                            </span>
+                        )}
+                    </button>
+                )}
             </div>
 
             <ListCategoryMenu

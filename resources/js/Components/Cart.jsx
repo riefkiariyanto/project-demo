@@ -330,19 +330,17 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
     }
 
     // ──────────────────────────────────────────────────────────────
-    // DESKTOP: fixed side panel
+    // DESKTOP: side panel (non-fixed, fills wrapper in Kasir.jsx)
     // ──────────────────────────────────────────────────────────────
     return (
         <>
-            <div className={`fixed top-0 right-0 h-full z-50 transition-all duration-300 ease-in-out ${open ? "w-[320px]" : "w-0 pointer-events-none"}`}>
+            <div className="h-full w-full flex flex-col bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-l-3xl shadow-xl border-l border-gray-200 dark:border-slate-700 overflow-hidden"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+            >
                 {open && (
-                    <div
-                        style={{ transform: `translateX(${dragX}px)` }}
-                        className="h-full w-full flex flex-col bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded-l-3xl shadow-xl border-l border-gray-200 dark:border-slate-700 overflow-hidden"
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                    >
+                    <div className="h-full flex flex-col">
                         {/* HEADER */}
                         <div className="p-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
                             <div>
