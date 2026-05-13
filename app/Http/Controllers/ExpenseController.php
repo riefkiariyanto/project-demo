@@ -57,7 +57,7 @@ class ExpenseController extends Controller
             ->map(fn($g) => (float) $g->sum('amount'));
 
         $materials = Material::where('store_id', $storeId)
-            ->select('id', 'name', 'unit', 'buy_price')
+            ->select('id', 'name', 'unit', 'buy_price', 'initial_qty')
             ->orderBy('name')
             ->get();
 

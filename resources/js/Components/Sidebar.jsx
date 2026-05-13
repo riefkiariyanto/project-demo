@@ -7,6 +7,7 @@ import {
     ChartBarIcon,
     Cog6ToothIcon,
     BanknotesIcon,
+    BuildingStorefrontIcon,
     ArrowRightOnRectangleIcon,
     Bars3Icon,
     SunIcon,
@@ -56,7 +57,7 @@ export default function Sidebar({ open, setOpen, isDark }) {
         },
         {
             name: "Kelola Toko",
-            icon: Cog6ToothIcon,
+            icon: BuildingStorefrontIcon,
             link: "/kelolatoko",
             roles: ["superadmin", "admin"],
         },

@@ -36,13 +36,20 @@ function AddModal({ materials, onClose }) {
         setData((prev) => ({ ...prev, category: cat, material_id: '', qty: '', harga_unit: '', amount: '', description: '' }));
     };
 
+    const getHargaUnit = (mat) => {
+        if (!mat) return '';
+        const initialQty = parseFloat(mat.initial_qty) || 1;
+        return String(parseFloat(mat.buy_price) / initialQty);
+    };
+
     const handleMaterialChange = (id) => {
         const mat = materials.find((m) => String(m.id) === id);
+        const hargaUnit = getHargaUnit(mat);
         setData((prev) => ({
             ...prev,
             material_id: id,
-            harga_unit: mat ? String(mat.buy_price) : '',
-            amount: prev.qty && mat ? String(parseFloat(prev.qty) * parseFloat(mat.buy_price)) : '',
+            harga_unit: hargaUnit,
+            amount: prev.qty && hargaUnit ? String(parseFloat(prev.qty) * parseFloat(hargaUnit)) : '',
         }));
     };
 
