@@ -83,6 +83,10 @@ export function buildReceiptHTML({ store, kasirName, invoiceNo, saleDate, items,
 
     lines.push(div, ctr('Terima kasih!'), ctr('WERP'));
 
+    const logoHtml = store?.logo
+        ? `<div style="text-align:center;margin-bottom:8px"><img src="/storage/${store.logo}" style="width:72px;height:72px;border-radius:50%;object-fit:cover" /></div>`
+        : '';
+
     return `<!DOCTYPE html>
 <html lang="id"><head>
 <meta charset="UTF-8"/>
@@ -94,7 +98,7 @@ export function buildReceiptHTML({ store, kasirName, invoiceNo, saleDate, items,
 </style>
 </head>
 <body>
-<pre>${lines.join('\n')}</pre>
+${logoHtml}<pre>${lines.join('\n')}</pre>
 <script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}<\/script>
 </body>
 </html>`;

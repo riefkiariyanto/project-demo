@@ -74,7 +74,7 @@ function NotaModal({ sale, onClose }) {
 
     const handleBrowserPrint = () => {
         const html = buildReceiptHTML({
-            store: { name: sale.store_name, address: sale.store_address, phone: sale.store_phone },
+            store: { name: sale.store_name, address: sale.store_address, phone: sale.store_phone, logo: sale.store_logo },
             kasirName: sale.kasir_name,
             invoiceNo: sale.invoice_no,
             saleDate: sale.sale_date,
@@ -103,7 +103,7 @@ function NotaModal({ sale, onClose }) {
         setBtMsg(null);
         const bt = window.bluetoothSerial;
         const bytes = buildEscPos({
-            store: { name: sale.store_name, address: sale.store_address, phone: sale.store_phone },
+            store: { name: sale.store_name, address: sale.store_address, phone: sale.store_phone, logo: sale.store_logo },
             kasirName: sale.kasir_name,
             invoiceNo: sale.invoice_no,
             saleDate: sale.sale_date,

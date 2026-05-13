@@ -133,6 +133,7 @@ class LaporanController extends Controller
                 'store_name'     => $sale->store->name ?? null,
                 'store_address'  => $sale->store->address ?? null,
                 'store_phone'    => $sale->store->phone ?? null,
+                'store_logo'     => $sale->store->logo ?? null,
                 'items_count'    => $sale->items->sum('qty'),
                 'items'          => $sale->items->map(fn($item) => [
                     'name'     => $item->product->name ?? '-',
