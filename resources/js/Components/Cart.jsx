@@ -1,3 +1,4 @@
+import { buildEscPos } from '@/helpers/escpos';
 import { useRef, useState, useEffect } from "react";
 import { ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import BluetoothPrinterModal from "@/Components/BluetoothPrinterModal";
@@ -6,6 +7,36 @@ const isNative = () => typeof window !== "undefined" && window.Capacitor?.isNati
 
 function PrintModal({ data, onPrint, onClose, formatCurrency }) {
     const [showBT, setShowBT] = useState(false);
+
+    const [autoPrinting, setAutoPrinting] = useState(false);
+
+    const autoPrint = () => {
+        const saved = (() => {
+            try { return JSON.parse(localStorage.getItem('werp_bt_printer')); } catch { return null; }
+        })();
+
+        if (!saved?.address) {
+            setShowBT(true);
+            return;
+        }
+
+        setAutoPrinting(true);
+        const bt = window.bluetoothSerial;
+
+        bt.connect(
+            saved.address,
+            () => {
+                const bytes = buildEscPos(data);
+                bt.write(
+                    bytes,
+                    () => { setAutoPrinting(false); onClose(); },
+                    () => { setAutoPrinting(false); setShowBT(true); }
+                );
+            },
+            () => { setAutoPrinting(false); setShowBT(true); }
+        );
+    };
+
     if (!data) return null;
     return (
         <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4 pb-20 sm:pb-4">
@@ -52,9 +83,9 @@ function PrintModal({ data, onPrint, onClose, formatCurrency }) {
                         Lewati
                     </button>
                     {isNative() ? (
-                        <button onClick={() => setShowBT(true)}
-                            className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2">
-                            🖨️ Cetak Nota
+                        <button onClick={autoPrint} disabled={autoPrinting}
+                            className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+                            {autoPrinting ? '⏳ Menghubungkan...' : '🖨️ Cetak Nota'}
                         </button>
                     ) : (
                         <button onClick={() => { onPrint(); onClose(); }}
