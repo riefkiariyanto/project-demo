@@ -53,6 +53,12 @@ export default function Sidebar({ open, setOpen, isDark }) {
             link: "/kelolatoko",
             roles: ["superadmin", "admin"],
         },
+        {
+            name: 'Pengaturan',
+            icon: Cog6ToothIcon,
+            link: '/pengaturan',
+            roles: ['user', 'admin', 'superadmin'],
+        },
     ];
 
     const filteredMenus = menus.filter((menu) =>
