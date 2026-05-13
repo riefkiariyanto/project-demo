@@ -12,9 +12,55 @@ const row     = (l, r) => { const sp = Math.max(1, W - l.length - r.length); ret
 const fmt = (v) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(v || 0);
 
-export function buildEscPos({ store, kasirName, invoiceNo, saleDate, items, total, payment, paid, change }) {
+export async function buildLogoBytes(logoUrl) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const maxDim = 200;
+            let w = img.naturalWidth, h = img.naturalHeight;
+            const scale = Math.min(1, maxDim / Math.max(w, h));
+            w = Math.round(w * scale); h = Math.round(h * scale);
+            const printW = Math.ceil(w / 8) * 8;
+            const widthBytes = printW / 8;
+            const canvas = document.createElement('canvas');
+            canvas.width = printW; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, printW, h);
+            ctx.drawImage(img, Math.floor((printW - w) / 2), 0, w, h);
+            const { data } = ctx.getImageData(0, 0, printW, h);
+            const paperBytes = 48; // 58mm @ 203dpi = 384 dots = 48 bytes
+            const padL = Math.max(0, Math.floor((paperBytes - widthBytes) / 2));
+            const bitmap = [];
+            for (let y = 0; y < h; y++) {
+                for (let p = 0; p < padL; p++) bitmap.push(0x00);
+                for (let xB = 0; xB < widthBytes; xB++) {
+                    let byte = 0;
+                    for (let bit = 0; bit < 8; bit++) {
+                        const x = xB * 8 + bit;
+                        const i = (y * printW + x) * 4;
+                        const lum = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                        if (lum < 128) byte |= (0x80 >> bit);
+                    }
+                    bitmap.push(byte);
+                }
+                const rightPad = Math.max(0, paperBytes - padL - widthBytes);
+                for (let p = 0; p < rightPad; p++) bitmap.push(0x00);
+            }
+            const xL = paperBytes & 0xFF, xH = (paperBytes >> 8) & 0xFF;
+            const yL = h & 0xFF, yH = (h >> 8) & 0xFF;
+            resolve([0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH, ...bitmap, 0x0A]);
+        };
+        img.onerror = () => resolve([]);
+        img.src = logoUrl;
+    });
+}
+
+export function buildEscPos({ store, kasirName, invoiceNo, saleDate, items, total, payment, paid, change, logoBitmap = [] }) {
     const bytes = [
         ESC, 0x40,
+        ...logoBitmap,
         ESC, 0x45, 0x01, ...center(store?.name ?? 'TOKO'), ESC, 0x45, 0x00,
         ...center(store?.address ?? ''),
         ...(store?.phone ? center(store.phone) : []),

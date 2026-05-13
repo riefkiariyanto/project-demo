@@ -1,4 +1,4 @@
-import { buildEscPos, buildReceiptHTML } from '@/helpers/escpos';
+import { buildEscPos, buildReceiptHTML, buildLogoBytes } from '@/helpers/escpos';
 import { useRef, useState, useEffect } from "react";
 import { ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import BluetoothPrinterModal from "@/Components/BluetoothPrinterModal";
@@ -10,7 +10,7 @@ function PrintModal({ data, onPrint, onClose, formatCurrency }) {
 
     const [autoPrinting, setAutoPrinting] = useState(false);
 
-    const autoPrint = () => {
+    const autoPrint = async () => {
         const saved = (() => {
             try { return JSON.parse(localStorage.getItem('werp_bt_printer')); } catch { return null; }
         })();
@@ -23,10 +23,14 @@ function PrintModal({ data, onPrint, onClose, formatCurrency }) {
         setAutoPrinting(true);
         const bt = window.bluetoothSerial;
 
+        const logoBitmap = data.store?.logo
+            ? await buildLogoBytes('/storage/' + data.store.logo).catch(() => [])
+            : [];
+
         bt.connect(
             saved.address,
             () => {
-                const bytes = buildEscPos(data);
+                const bytes = buildEscPos({ ...data, logoBitmap });
                 bt.write(
                     bytes,
                     () => { setAutoPrinting(false); onClose(); },

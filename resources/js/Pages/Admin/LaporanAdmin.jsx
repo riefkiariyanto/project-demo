@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
-import { buildEscPos, buildReceiptHTML } from "@/helpers/escpos";
+import { buildEscPos, buildReceiptHTML, buildLogoBytes } from "@/helpers/escpos";
 import { useState, useRef, useEffect, useMemo } from "react";
 import {
     AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -89,7 +89,7 @@ function NotaModal({ sale, onClose }) {
         w.document.close();
     };
 
-    const handleBTPrint = () => {
+    const handleBTPrint = async () => {
         if (!isNative()) {
             setBtMsg({ type: "error", text: "Fitur ini hanya tersedia di aplikasi Android." });
             return;
@@ -102,6 +102,9 @@ function NotaModal({ sale, onClose }) {
         setPrinting(true);
         setBtMsg(null);
         const bt = window.bluetoothSerial;
+        const logoBitmap = sale.store_logo
+            ? await buildLogoBytes('/storage/' + sale.store_logo).catch(() => [])
+            : [];
         const bytes = buildEscPos({
             store: { name: sale.store_name, address: sale.store_address, phone: sale.store_phone, logo: sale.store_logo },
             kasirName: sale.kasir_name,
@@ -112,6 +115,7 @@ function NotaModal({ sale, onClose }) {
             payment: sale.payment_method,
             paid: sale.paid_amount,
             change: sale.change_amount,
+            logoBitmap,
         });
         bt.connect(
             saved.address,
