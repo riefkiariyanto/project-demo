@@ -271,7 +271,15 @@ export default function Welcome({ auth }) {
                     </div>
 
                 </section>
-                
+
+                {/* Footer */}
+                <footer className="text-center py-6 text-xs text-gray-400 border-t border-gray-100 dark:border-slate-800">
+                    <p className="mb-1">© {new Date().getFullYear()} WERP — Warung & Resto Point of Sale</p>
+                    <div className="flex justify-center gap-4">
+                        <Link href="/privacy" className="hover:text-orange-500 transition">Kebijakan Privasi</Link>
+                        <Link href="/tos" className="hover:text-orange-500 transition">Syarat & Ketentuan</Link>
+                    </div>
+                </footer>
 
             </div>
         </>

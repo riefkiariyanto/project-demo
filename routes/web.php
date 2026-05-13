@@ -24,6 +24,9 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/privacy', fn() => Inertia::render('PrivacyPolicy'))->name('privacy');
+Route::get('/tos', fn() => Inertia::render('TermsOfService'))->name('tos');
+
 Route::middleware(['auth', 'role:superadmin|admin'])->group(function () {
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');

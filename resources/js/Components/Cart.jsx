@@ -1,10 +1,14 @@
 import { useRef, useState, useEffect } from "react";
 import { ShoppingCartIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import BluetoothPrinterModal from "@/Components/BluetoothPrinterModal";
+
+const isNative = () => typeof window !== "undefined" && window.Capacitor?.isNative;
 
 function PrintModal({ data, onPrint, onClose, formatCurrency }) {
+    const [showBT, setShowBT] = useState(false);
     if (!data) return null;
     return (
-        <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[80] bg-black/60 flex items-center justify-center p-4 pb-20 sm:pb-4">
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
                 {/* Header */}
                 <div className="bg-green-500 px-6 py-5 text-white text-center">
@@ -47,12 +51,26 @@ function PrintModal({ data, onPrint, onClose, formatCurrency }) {
                         className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-slate-300 font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition text-sm">
                         Lewati
                     </button>
-                    <button onClick={() => { onPrint(); onClose(); }}
-                        className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2">
-                        🖨️ Cetak Nota
-                    </button>
+                    {isNative() ? (
+                        <button onClick={() => setShowBT(true)}
+                            className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2">
+                            🖨️ Cetak Nota
+                        </button>
+                    ) : (
+                        <button onClick={() => { onPrint(); onClose(); }}
+                            className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition text-sm flex items-center justify-center gap-2">
+                            🖨️ Cetak Nota
+                        </button>
+                    )}
                 </div>
             </div>
+            {showBT && (
+                <BluetoothPrinterModal
+                    receiptData={data}
+                    onClose={() => { setShowBT(false); onClose(); }}
+                    formatCurrency={formatCurrency}
+                />
+            )}
         </div>
     );
 }
@@ -388,7 +406,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
 
                 {/* PAYMENT MODAL — CASH / DEBIT */}
                 {showPaymentModal && payment !== "QRIS" && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4 pb-20 sm:pb-4">
                         <div className="bg-[#1f2937] rounded-2xl p-6 w-full max-w-md text-white space-y-4 shadow-2xl">
                             <h3 className="text-xl font-bold">Input Pembayaran</h3>
                             <div className="space-y-2">
@@ -426,7 +444,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
 
                 {/* PAYMENT MODAL — QRIS */}
                 {showPaymentModal && payment === "QRIS" && (
-                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
+                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4 pb-20 sm:pb-4">
                         <div className="bg-[#1f2937] rounded-2xl p-6 w-full max-w-sm text-white space-y-4 shadow-2xl">
                             <div className="text-center">
                                 <h3 className="text-xl font-bold">Bayar via QRIS</h3>

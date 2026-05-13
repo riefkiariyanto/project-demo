@@ -156,7 +156,7 @@ function GlassCard({ children, className = "" }) {
 function Modal({ show, onClose, title, subtitle, children, footer }) {
     if (!show) return null;
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 pb-16 sm:pb-0">
             <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-2xl overflow-visible">
                 <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex justify-between items-center">
                     <div>
@@ -921,7 +921,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
 
             {/* MODAL RESEP */}
             {showRecipeModal && (
-                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 pb-16 sm:pb-0">
                     <div className="w-full max-w-xl bg-white dark:bg-slate-800 rounded-3xl border border-gray-200 dark:border-slate-700 shadow-2xl overflow-visible">
                         <div className="px-6 py-4 border-b border-white/20 flex justify-between items-center">
                             <div><h2 className="text-lg font-bold">Atur Resep</h2>
@@ -970,7 +970,7 @@ export default function KelolaToko({ auth, products = [], categories = [], mater
 
             {/* ── CATEGORY MODAL ──────────────────────────────────────── */}
             {showCategoryModal && (
-                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 pb-20 sm:pb-4">
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
                         <div className="flex justify-between items-center">
                             <h3 className="font-bold text-gray-900 dark:text-white text-lg">
