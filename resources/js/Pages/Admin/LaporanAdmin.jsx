@@ -262,10 +262,12 @@ function SummarySection({ summary, bulan }) {
     const label = mode === "bulan" ? bulan : (harian?.label ?? tanggal);
 
     const cards = [
-        { title: "Pendapatan Kotor", value: data ? fmt(data.pendapatan) : "-", growth: data?.growthPendapatan ?? 0, icon: BanknotesIcon, color: "from-orange-600 to-orange-700" },
-        { title: "HPP", value: data ? fmt(data.hpp ?? 0) : "-", growth: 0, icon: CubeIcon, color: "from-slate-600 to-slate-700", noGrowth: true, hint: "Harga Pokok Penjualan" },
-        { title: "Pendapatan Bersih", value: data ? fmt(data.bersih ?? 0) : "-", growth: data?.growthBersih ?? 0, icon: ReceiptPercentIcon, color: "from-green-600 to-green-700" },
-        { title: "Total Pesanan", value: data ? (data.pesanan ?? 0) : "-", growth: data?.growthPesanan ?? 0, icon: ShoppingCartIcon, color: "from-rose-600 to-rose-700" },
+        { title: "Pendapatan Kotor",         value: data ? fmt(data.pendapatan) : "-",                  growth: data?.growthPendapatan ?? 0,  icon: BanknotesIcon,      color: "from-orange-600 to-orange-700" },
+        { title: "HPP",                       value: data ? fmt(data.hpp ?? 0) : "-",                    growth: 0,                            icon: CubeIcon,           color: "from-slate-600 to-slate-700",  noGrowth: true, hint: "Harga Pokok Penjualan" },
+        { title: "Laba Kotor",                value: data ? fmt(data.bersih ?? 0) : "-",                 growth: data?.growthBersih ?? 0,      icon: ReceiptPercentIcon, color: "from-green-600 to-green-700" },
+        { title: "Total Pesanan",             value: data ? (data.pesanan ?? 0) : "-",                   growth: data?.growthPesanan ?? 0,     icon: ShoppingCartIcon,   color: "from-rose-600 to-rose-700" },
+        { title: "Pengeluaran",              value: data ? fmt(data.pengeluaran ?? 0) : "-",             growth: data?.growthPengeluaran ?? 0, icon: BanknotesIcon,      color: "from-red-600 to-red-700" },
+        { title: "Laba Setelah Pengeluaran", value: data ? fmt(data.labaSetelahPengeluaran ?? 0) : "-", growth: data?.growthLabaSetelah ?? 0,  icon: ReceiptPercentIcon, color: "from-teal-600 to-teal-700" },
     ];
 
     return (
@@ -294,7 +296,7 @@ function SummarySection({ summary, bulan }) {
 
             {error && <div className="px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm">{error}</div>}
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {cards.map(c => <KpiCard key={c.title} {...c} sub={sub} loading={mode === "hari" && loading} />)}
             </div>
         </div>

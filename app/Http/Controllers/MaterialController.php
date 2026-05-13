@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -86,14 +87,24 @@ class MaterialController extends Controller
 
     if ($request->type === 'in') {
         $bahan->stock += $request->qty;
+        $bahan->save();
+
+        Expense::create([
+            'store_id'     => $bahan->store_id,
+            'user_id'      => auth()->id(),
+            'category'     => 'Belanja Bahan',
+            'description'  => $bahan->name,
+            'material_id'  => $bahan->id,
+            'amount'       => $bahan->buy_price * $request->qty,
+            'expense_date' => now()->toDateString(),
+        ]);
     } else {
         $bahan->stock -= $request->qty;
         if ($bahan->stock < 0) {
             $bahan->stock = 0;
         }
+        $bahan->save();
     }
-
-    $bahan->save();
 
     return back()->with('success', 'Stock berhasil diperbarui');
 }

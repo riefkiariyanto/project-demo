@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\Expense;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -73,6 +74,22 @@ class LaporanController extends Controller
         $growthItem = $itemLalu > 0
             ? round((($itemIni - $itemLalu) / $itemLalu) * 100, 1)
             : ($itemIni > 0 ? 100 : 0);
+
+        // Pengeluaran
+        $pengeluaranBase = fn() => Expense::query()
+            ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $storeId));
+
+        $pengeluaranIni  = (clone $pengeluaranBase())->whereBetween('expense_date', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])->sum('amount');
+        $pengeluaranLalu = (clone $pengeluaranBase())->whereBetween('expense_date', [$startOfLastMonth->toDateString(), $endOfLastMonth->toDateString()])->sum('amount');
+        $growthPengeluaran = $pengeluaranLalu > 0
+            ? round((($pengeluaranIni - $pengeluaranLalu) / $pengeluaranLalu) * 100, 1)
+            : ($pengeluaranIni > 0 ? 100 : 0);
+
+        $labaSetelahIni  = $bersihIni - $pengeluaranIni;
+        $labaSetelahLalu = $bersihLalu - $pengeluaranLalu;
+        $growthLabaSetelah = $labaSetelahLalu > 0
+            ? round((($labaSetelahIni - $labaSetelahLalu) / $labaSetelahLalu) * 100, 1)
+            : ($labaSetelahIni > 0 ? 100 : 0);
 
         // Chart
         $chartData = (clone $base())
@@ -153,7 +170,11 @@ class LaporanController extends Controller
                 'pesanan'          => $pesananIni,
                 'growthPesanan'    => $growthPesanan,
                 'itemTerjual'      => (int) $itemIni,
-                'growthItem'       => $growthItem,
+                'growthItem'             => $growthItem,
+                'pengeluaran'            => (float) $pengeluaranIni,
+                'growthPengeluaran'      => $growthPengeluaran,
+                'labaSetelahPengeluaran' => (float) $labaSetelahIni,
+                'growthLabaSetelah'      => $growthLabaSetelah,
             ],
             'chartData'    => $chartData,
             'kalenderData' => $kalenderData,
@@ -222,18 +243,38 @@ class LaporanController extends Controller
             ? round((($bersihHariIni - $bersihHariLalu) / $bersihHariLalu) * 100, 1)
             : ($bersihHariIni > 0 ? 100 : 0);
 
+        // Pengeluaran harian
+        $pengeluaranHariBase = fn() => Expense::query()
+            ->when(!$isSuperadmin, fn($q) => $q->where('store_id', $storeId));
+
+        $pengeluaranHariIni  = (clone $pengeluaranHariBase())->whereBetween('expense_date', [$hari->toDateString(), $hariAkhir->toDateString()])->sum('amount');
+        $pengeluaranHariLalu = (clone $pengeluaranHariBase())->whereBetween('expense_date', [$hariLalu->toDateString(), $hariLaluAkhir->toDateString()])->sum('amount');
+        $growthPengeluaranHari = $pengeluaranHariLalu > 0
+            ? round((($pengeluaranHariIni - $pengeluaranHariLalu) / $pengeluaranHariLalu) * 100, 1)
+            : ($pengeluaranHariIni > 0 ? 100 : 0);
+
+        $labaSetelahHariIni  = $bersihHariIni - $pengeluaranHariIni;
+        $labaSetelahHariLalu = $bersihHariLalu - $pengeluaranHariLalu;
+        $growthLabaSetelahHari = $labaSetelahHariLalu > 0
+            ? round((($labaSetelahHariIni - $labaSetelahHariLalu) / $labaSetelahHariLalu) * 100, 1)
+            : ($labaSetelahHariIni > 0 ? 100 : 0);
+
         return response()->json([
-            'pendapatan'       => (float) $pendapatanIni,
-            'growthPendapatan' => $growthPendapatan,
-            'hpp'              => (float) $hppHariIni,
-            'bersih'           => (float) $bersihHariIni,
-            'growthBersih'     => $growthBersihHari,
-            'pesanan'          => $pesananIni,
-            'growthPesanan'    => $growthPesanan,
-            'itemTerjual'      => (int) $itemIni,
-            'growthItem'       => $growthItem,
-            'label'            => Carbon::parse($request->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
-            'labelBanding'     => 'vs kemarin',
+            'pendapatan'             => (float) $pendapatanIni,
+            'growthPendapatan'       => $growthPendapatan,
+            'hpp'                    => (float) $hppHariIni,
+            'bersih'                 => (float) $bersihHariIni,
+            'growthBersih'           => $growthBersihHari,
+            'pesanan'                => $pesananIni,
+            'growthPesanan'          => $growthPesanan,
+            'itemTerjual'            => (int) $itemIni,
+            'growthItem'             => $growthItem,
+            'pengeluaran'            => (float) $pengeluaranHariIni,
+            'growthPengeluaran'      => $growthPengeluaranHari,
+            'labaSetelahPengeluaran' => (float) $labaSetelahHariIni,
+            'growthLabaSetelah'      => $growthLabaSetelahHari,
+            'label'                  => Carbon::parse($request->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+            'labelBanding'           => 'vs kemarin',
         ]);
     }
 }

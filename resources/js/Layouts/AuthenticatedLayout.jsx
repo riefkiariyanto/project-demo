@@ -5,6 +5,7 @@ import {
     ShoppingCartIcon,
     ChartBarIcon,
     Cog6ToothIcon,
+    BanknotesIcon,
     XMarkIcon,
     ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/solid";
@@ -57,8 +58,9 @@ export default function AuthenticatedLayout({ header, children, openCart, hideSe
     const bottomNavItems = [
         { name: "Home", icon: HomeIcon, link: getDashboardLink(), roles: ["user", "admin", "superadmin"] },
         { name: "Kasir", icon: ShoppingCartIcon, link: "/kasir", roles: ["admin", "superadmin", "user"] },
-        { name: "Laporan", icon: ChartBarIcon, link: "/laporan", roles: ["admin", "superadmin"] },
-        { name: "Toko", icon: Cog6ToothIcon, link: "/kelolatoko", roles: ["admin", "superadmin"] },
+        { name: "Laporan",     icon: ChartBarIcon,  link: "/laporan",      roles: ["admin", "superadmin"] },
+        { name: "Pengeluaran", icon: BanknotesIcon, link: "/pengeluaran",  roles: ["user", "admin", "superadmin"] },
+        { name: "Toko",        icon: Cog6ToothIcon, link: "/kelolatoko",   roles: ["admin", "superadmin"] },
         { name: 'Setting', icon: Cog6ToothIcon, link: '/pengaturan', roles: ['user', 'admin', 'superadmin'] },
     ].filter(item => item.roles.some(role => roles.includes(role)));
 

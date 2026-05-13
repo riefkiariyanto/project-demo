@@ -6,6 +6,7 @@ import {
     ShoppingCartIcon,
     ChartBarIcon,
     Cog6ToothIcon,
+    BanknotesIcon,
     ArrowRightOnRectangleIcon,
     Bars3Icon,
     SunIcon,
@@ -46,6 +47,12 @@ export default function Sidebar({ open, setOpen, isDark }) {
             icon: ChartBarIcon,
             link: "/laporan",
             roles: ["admin", "superadmin"],
+        },
+        {
+            name: "Pengeluaran",
+            icon: BanknotesIcon,
+            link: "/pengeluaran",
+            roles: ["user", "admin", "superadmin"],
         },
         {
             name: "Kelola Toko",

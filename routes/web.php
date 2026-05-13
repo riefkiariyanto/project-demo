@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\StoreRegistrationController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\ExpenseController;
 
 
 Route::get('/', function () {
@@ -59,6 +60,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+    Route::get('/pengeluaran', [ExpenseController::class, 'index'])->name('pengeluaran');
+    Route::post('/pengeluaran', [ExpenseController::class, 'store'])->name('pengeluaran.store');
 });
 
 Route::middleware(['auth', 'role:superadmin|user|admin'])->group(function () {
