@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import {
@@ -50,12 +50,6 @@ function PrinterTab() {
     const [error, setError]           = useState(null);
 
     const bt = () => window.bluetoothSerial;
-
-    useEffect(() => {
-        if (saved && isNative()) {
-            connectTo(saved);
-        }
-    }, []);
 
     const scan = () => {
         setScanning(true);

@@ -487,7 +487,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                                 ) : (
                                     <div className="w-56 h-56 rounded-xl border-2 border-dashed border-gray-600 flex flex-col items-center justify-center gap-2 text-gray-500">
                                         <span className="text-5xl">📷</span>
-                                        <p className="text-xs text-center px-4">QR belum diupload. Upload di Kelola Toko → Toko</p>
+                                        <p className="text-xs text-center px-4">QR belum diupload. Upload di Pengaturan → Profil Toko</p>
                                     </div>
                                 )}
                             </div>
@@ -655,7 +655,7 @@ export default function Cart({ cart, open, setOpen, setCart, qrisImage = null, i
                             ) : (
                                 <div className="w-56 h-56 rounded-xl border-2 border-dashed border-gray-600 flex flex-col items-center justify-center gap-2 text-gray-500">
                                     <span className="text-5xl">📷</span>
-                                    <p className="text-xs text-center px-4">QR belum diupload. Upload di Kelola Toko → Toko</p>
+                                    <p className="text-xs text-center px-4">QR belum diupload. Upload di Pengaturan → Profil Toko</p>
                                 </div>
                             )}
                         </div>
