@@ -2,7 +2,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-13-pengaturan-toko-design.md`
 **Date:** 2026-05-13
-**Status:** Draft
+**Status:** Approved
 
 ---
 
