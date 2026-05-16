@@ -51,8 +51,43 @@ function PrinterTab() {
 
     const bt = () => window.bluetoothSerial;
 
+    const scan = (silent = false) => {
+        if (!silent) setScanning(true);
+        setError(null);
+
+        const doList = () => {
+            bt()?.list(
+                (list) => {
+                    setDevices(list ?? []);
+                    setScanning(false);
+                    if (!silent && (!list || list.length === 0)) {
+                        setError('Tidak ada perangkat paired. Pair printer dulu di Pengaturan Bluetooth Android.');
+                    }
+                },
+                (err) => {
+                    setScanning(false);
+                    setError('Gagal scan: ' + err + '. Pastikan Bluetooth aktif dan izin diberikan.');
+                }
+            );
+        };
+
+        // Cek apakah Bluetooth aktif dulu
+        bt()?.isEnabled(
+            () => doList(),
+            () => {
+                setScanning(false);
+                setError('Bluetooth tidak aktif. Aktifkan Bluetooth terlebih dahulu.');
+            }
+        );
+    };
+
     useEffect(() => {
         if (!isNative()) return;
+
+        // Auto-scan saat tab dibuka supaya daftar device langsung muncul
+        scan(true);
+
+        // Cek status koneksi device tersimpan
         const s = (() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } })();
         if (!s?.address) return;
         bt()?.isConnected(
@@ -66,15 +101,6 @@ function PrinterTab() {
             }
         );
     }, []);
-
-    const scan = () => {
-        setScanning(true);
-        setError(null);
-        bt()?.list(
-            (list) => { setDevices(list); setScanning(false); },
-            (err)  => { setError('Gagal scan: ' + err); setScanning(false); }
-        );
-    };
 
     const connectTo = (device) => {
         setConnecting(device.address);
@@ -164,10 +190,10 @@ function PrinterTab() {
                 </div>
             )}
 
-            <button onClick={scan} disabled={scanning}
+            <button onClick={() => scan(false)} disabled={scanning}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-orange-300 dark:border-orange-600 text-orange-500 dark:text-orange-400 text-sm font-semibold hover:bg-orange-50 dark:hover:bg-orange-900/20 transition disabled:opacity-50">
                 <ArrowPathIcon className={`w-4 h-4 ${scanning ? 'animate-spin' : ''}`} />
-                {scanning ? 'Mencari perangkat...' : 'Scan & Ganti Printer'}
+                {scanning ? 'Mencari perangkat...' : 'Refresh Daftar Printer'}
             </button>
 
             {devices.length > 0 && (
