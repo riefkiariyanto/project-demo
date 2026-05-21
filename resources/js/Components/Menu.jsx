@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useRef, useState, useEffect } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import ListCategoryMenu from "@/Components/ListCategoryMenu";
@@ -8,14 +9,21 @@ export default function Menu({ onAdd, openCart }) {
 =======
 import { useRef, useState, useEffect, useMemo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+=======
+import { useState, useMemo } from "react";
+import { MagnifyingGlassIcon, ShoppingCartIcon } from "@heroicons/react/24/solid";
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
 import ListCategoryMenu from "@/Components/ListCategoryMenu";
 
-export default function Menu({ onAdd, openCart, products = [], categories = [] }) {
-    const scrollRef = useRef();
+import { useDarkMode } from "@/hooks/useDarkMode";
+
+export default function Menu({ onAdd, openCart, setOpenCart, cart = [], products = [], categories = [] }) {
+    const { isDark } = useDarkMode();
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [search, setSearch] = useState("");
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
 
+<<<<<<< HEAD
     // DRAG STATE
     const [isDown, setIsDown] = useState(false);
     const [startY, setStartY] = useState(0);
@@ -57,38 +65,27 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
 <<<<<<< HEAD
 =======
     // Filter products by category and search
+=======
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
     const filteredProducts = useMemo(() => {
         let result = products;
-
         if (selectedCategory) {
-            result = result.filter((product) => 
-                product.category_id === selectedCategory
-            );
+            result = result.filter((product) => product.category_id === selectedCategory);
         }
-
         if (search) {
             result = result.filter((product) =>
                 (product.name || "").toLowerCase().includes(search.toLowerCase())
             );
         }
-
         return result;
     }, [products, selectedCategory, search]);
 
-    // Get unique categories from products
     const categoryOptions = useMemo(() => {
-        return categories.filter((cat) =>
-            products.some((p) => p.category_id === cat.id)
-        );
+        return categories.filter((cat) => products.some((p) => p.category_id === cat.id));
     }, [categories, products]);
 
     const getInitials = (name) => {
-        return name
-            .split(" ")
-            .map((word) => word[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
+        return name.split(" ").map((word) => word[0]).join("").toUpperCase().slice(0, 2);
     };
 
     const formatPrice = (price) => {
@@ -101,33 +98,44 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
 
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
     return (
-        <div className="
-                w-full
-                min-w-[280px]
-                bg-white/30 backdrop-blur-xl rounded-2xl p-3
-                border border-white/30
-                max-h-[800px]
-                flex flex-col
-            ">
+        <div className={`w-full rounded-2xl px-1 py-1 border h-full min-h-0 flex flex-col ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200 shadow-sm"}`}>
             {/* HEADER */}
-            <div className="flex px-6 justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-white">
-                    Semua menu
-                </h2>
-
-                <div className="flex items-center bg-white/30 rounded-full px-3 py-1">
+            <div className="flex px-2 justify-between items-center mb-2 gap-2">
+                <h2 className={`text-xl font-bold shrink-0 ${isDark ? "text-white" : "text-gray-900"}`}>Semua menu</h2>
+                <div className={`flex items-center rounded-full px-2 py-1 flex-1 ${isDark ? "bg-slate-700" : "bg-gray-100"}`}>
                     <input
                         placeholder="Search menu..."
 <<<<<<< HEAD
 =======
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+<<<<<<< HEAD
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                         className="bg-transparent w-full text-orange-400 font-semibold placeholder-orange-400 border-0 outline-none focus:ring-0 focus:outline-none" />
                     <MagnifyingGlassIcon className="w-6 h-6 text-orange-500 drop-shadow-sm " />
+=======
+                        className={`bg-transparent w-full font-semibold border-0 outline-none focus:ring-0 focus:outline-none ${isDark ? "text-white placeholder-slate-400" : "text-gray-700 placeholder-gray-400"}`}
+                    />
+                    <MagnifyingGlassIcon className="w-6 h-6 text-orange-500 drop-shadow-sm" />
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                 </div>
+                {/* Cart toggle — desktop only */}
+                {setOpenCart && (
+                    <button
+                        onClick={() => setOpenCart(!openCart)}
+                        className="hidden sm:flex relative shrink-0 items-center justify-center w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 text-white transition"
+                    >
+                        <ShoppingCartIcon className="w-5 h-5" />
+                        {cart.length > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 bg-white text-orange-500 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                {cart.reduce((s, i) => s + i.qty, 0)}
+                            </span>
+                        )}
+                    </button>
+                )}
             </div>
 
+<<<<<<< HEAD
 <<<<<<< HEAD
             <ListCategoryMenu categories={[
                 'ayam',
@@ -154,6 +162,10 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
 =======
             <ListCategoryMenu 
                 categories={categoryOptions} 
+=======
+            <ListCategoryMenu
+                categories={categoryOptions}
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
             />
@@ -161,23 +173,10 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
 
             {/* SCROLL AREA */}
             <div
-                ref={scrollRef}
-                onMouseDown={(e) => {
-                    e.preventDefault();
-                    handleMouseDown(e);
-                }}
-                onMouseUp={stopDrag}
-                onMouseLeave={stopDrag}
-                onMouseMove={handleMouseMove}
-                className="
-                    flex-1
-                    overflow-y-auto pr-3 pl-1 pb-2
-                    no-scrollbar
-                    cursor-grab active:cursor-grabbing
-                    select-none
-                    overscroll-contain
-                "
+                className="flex-1 overflow-y-auto px-3 pb-2 no-scrollbar overscroll-contain"
+                style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
             >
+<<<<<<< HEAD
 <<<<<<< HEAD
                 <div className="grid px-4 py-4 grid-cols-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {[...Array(20)].map((_, i) => (
@@ -219,13 +218,19 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                     ))}
 =======
                 <div className="grid px-4 py-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+=======
+                <div className="grid py-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 min-w-0">
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
                             <div
                                 key={product.id}
-                                className="bg-white/40 backdrop-blur-md rounded-2xl p-3 shadow-lg hover:scale-105 transition"
+                                onClick={() => product.available_stock > 0 && onAdd({ id: product.id, name: product.name, price: product.selling_price, selling_price: product.selling_price })}
+                                className={`rounded-2xl p-2 shadow-sm hover:scale-105 transition flex flex-col border ${isDark ? "bg-slate-700 border-slate-600" : "bg-white border-gray-100"} ${product.available_stock > 0 ? "cursor-pointer" : "cursor-not-allowed opacity-70"}`}
+                                style={{ touchAction: 'manipulation' }}
                             >
-                                <div className="relative h-36 flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500 rounded-xl text-white text-2xl font-bold mb-2 overflow-hidden">
+                                {/* IMAGE */}
+                                <div className="relative aspect-square flex items-center justify-center bg-gradient-to-br from-orange-300 to-orange-500 rounded-xl text-white text-2xl font-bold overflow-hidden">
                                     {product.image ? (
                                         <img
                                             src={`/storage/${product.image}`}
@@ -235,37 +240,31 @@ export default function Menu({ onAdd, openCart, products = [], categories = [] }
                                     ) : (
                                         <span>{getInitials(product.name)}</span>
                                     )}
-
-                                    <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
+                                    <span className={`absolute top-1 right-1 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                                         product.available_stock > 0
                                             ? "bg-green-100 text-green-600"
                                             : "bg-red-100 text-red-600"
                                     }`}>
-                                        {product.available_stock > 0 ? "Tersedia" : "Habis"}
+                                        {product.available_stock > 0 ? "Ada" : "Habis"}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center justify-between mt-1">
-                                    <div className="text-xs text-black font-semibold line-clamp-1">
+                                {/* INFO — nama dan harga stacked vertikal */}
+                                <div className="mt-1.5 flex-1 space-y-0.5 px-0.5">
+                                    <p className={`text-xs font-semibold line-clamp-2 leading-tight ${isDark ? "text-white" : "text-gray-900"}`}>
                                         {product.name}
-                                    </div>
-
-                                    <div className="text-black font-bold text-sm">
+                                    </p>
+                                    <p className="text-orange-600 font-bold text-xs leading-tight">
                                         {formatPrice(product.selling_price)}
-                                    </div>
+                                    </p>
                                 </div>
 
+                                {/* BUTTON */}
                                 <button
-                                    onClick={() =>
-                                        onAdd({
-                                            id: product.id,
-                                            name: product.name,
-                                            price: product.selling_price,
-                                            selling_price: product.selling_price,
-                                        })
-                                    }
+                                    onClick={(e) => { e.stopPropagation(); product.available_stock > 0 && onAdd({ id: product.id, name: product.name, price: product.selling_price, selling_price: product.selling_price }); }}
                                     disabled={product.available_stock <= 0}
-                                    className={`mt-2 w-full py-2 rounded-lg font-semibold transition ${
+                                    style={{ touchAction: 'manipulation' }}
+                                    className={`mt-2 w-full py-1.5 rounded-lg text-xs font-semibold transition ${
                                         product.available_stock > 0
                                             ? "bg-orange-500 text-white hover:bg-orange-600"
                                             : "bg-gray-400 text-gray-600 cursor-not-allowed"

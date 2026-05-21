@@ -71,7 +71,7 @@ export default function RiwayatPesanan() {
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
 
-                <h3 className="font-semibold text-white">
+                <h3 className="font-semibold text-gray-900 dark:text-white">
                     Riwayat Pesanan
                 </h3>
 
@@ -79,7 +79,7 @@ export default function RiwayatPesanan() {
                 <div className="relative" ref={dropdownRef}>
                     <button
                         onClick={() => setOpen(!open)}
-                        className="flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-full transition"
+                        className="flex items-center gap-2 text-xs bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 border border-gray-200 dark:border-white/20 px-3 py-1.5 rounded-full transition"
                     >
                         {selectedDay}
                         <span className={`text-[10px] transition ${open ? "rotate-180" : ""}`}>
@@ -97,9 +97,9 @@ export default function RiwayatPesanan() {
                                         setSelectedDay(d);
                                         setOpen(false);
                                     }}
-                                    className={`px-3 py-2 text-xs cursor-pointer transition hover:bg-white/10 ${selectedDay === d
-                                        ? "bg-white/10 text-orange-300"
-                                        : "text-white/70"
+                                    className={`px-3 py-2 text-xs cursor-pointer transition hover:bg-orange-50 dark:hover:bg-white/10 ${selectedDay === d
+                                        ? "bg-orange-50 dark:bg-white/10 text-orange-500 dark:text-orange-300"
+                                        : "text-gray-500 dark:text-white/70"
                                         }`}
                                 >
                                     {d}
@@ -126,22 +126,22 @@ export default function RiwayatPesanan() {
                     filtered.map((order) => (
                         <div
                             key={order.id}
-                            className="flex items-center bg-white/5 hover:bg-white/10 transition rounded-xl overflow-hidden group"
+                            className="flex items-center bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition rounded-xl overflow-hidden group"
                         >
 
                             <div className="flex flex-1 items-center justify-between px-4 py-3">
 
                                 {/* LEFT */}
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-sm font-semibold text-white">
+                                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-sm font-semibold text-gray-900 dark:text-white">
                                         {order.orderId.replace("#", "").slice(-2)}
                                     </div>
 
                                     <div>
-                                        <p className="text-sm text-white font-medium">
+                                        <p className="text-sm text-gray-900 dark:text-white font-medium">
                                             {order.orderId}
                                         </p>
-                                        <p className="text-xs text-white/50">
+                                        <p className="text-xs text-gray-400 dark:text-white/50">
                                             {order.time} • {order.total} item
                                         </p>
                                     </div>
@@ -155,7 +155,7 @@ export default function RiwayatPesanan() {
                                 </div>
 
                                 {/* ARROW RIGHT */}
-                                <div className="text-white/50 group-hover:text-white transition">
+                                <div className="text-gray-400 dark:text-white/50 group-hover:text-gray-700 dark:group-hover:text-white transition">
                                     <ChevronRightIcon className="w-5 h-5" />
                                 </div>
 
@@ -164,7 +164,7 @@ export default function RiwayatPesanan() {
                         </div>
                     ))
                 ) : (
-                    <div className="text-center text-white/40 text-sm py-10">
+                    <div className="text-center text-gray-400 dark:text-white/40 text-sm py-10">
                         Tidak ada pesanan
                     </div>
                 )}

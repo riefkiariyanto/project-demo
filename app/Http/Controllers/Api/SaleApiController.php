@@ -19,23 +19,40 @@ class SaleApiController extends Controller
             'items'                  => 'required|array|min:1',
             'items.*.product_id'     => 'required|integer|exists:products,id',
             'items.*.qty'            => 'required|integer|min:1',
-            'items.*.price'          => 'required|numeric|min:0',
             'payment_method'         => 'required|in:Cash,QRIS,Debit',
             'paid_amount'            => 'required|numeric|min:0',
-            'subtotal'               => 'required|numeric|min:0',
         ]);
- 
+
         DB::beginTransaction();
         try {
-            $user        = $request->user();
-            $subtotal    = (float) $validated['subtotal'];
-            $paidAmount  = (float) $validated['paid_amount'];
-            $change      = $paidAmount - $subtotal;
- 
+            $user       = $request->user();
+            $paidAmount = (float) $validated['paid_amount'];
+
+            // Load all products server-side to compute authoritative subtotal
+            $productIds = array_column($validated['items'], 'product_id');
+            $products   = Product::with('recipe.items.material')
+                ->whereIn('id', $productIds)
+                ->where('store_id', $user->store_id)
+                ->get()
+                ->keyBy('id');
+
+            foreach ($validated['items'] as $item) {
+                if (!$products->has($item['product_id'])) {
+                    return response()->json(['success' => false, 'message' => 'Produk tidak ditemukan di toko ini'], 422);
+                }
+            }
+
+            $subtotal = 0;
+            foreach ($validated['items'] as $item) {
+                $subtotal += (float) $products[$item['product_id']]->selling_price * $item['qty'];
+            }
+
+            $change = $paidAmount - $subtotal;
+
             if ($paidAmount < $subtotal) {
                 return response()->json(['success' => false, 'message' => 'Nominal pembayaran kurang!'], 422);
             }
- 
+
             $sale = Sale::create([
                 'invoice_no'     => $this->generateInvoiceNo(),
                 'store_id'       => $user->store_id,
@@ -50,17 +67,17 @@ class SaleApiController extends Controller
                 'status'         => 'completed',
                 'sale_date'      => now(),
             ]);
- 
+
             foreach ($validated['items'] as $item) {
-                $product = Product::with('recipe.items.material')->findOrFail($item['product_id']);
- 
+                $product = $products[$item['product_id']];
+
                 SaleItem::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $item['product_id'],
                     'qty'        => $item['qty'],
-                    'price'      => $item['price'],
-                    'cost_price' => 0,
-                    'subtotal'   => $item['price'] * $item['qty'],
+                    'price'      => $product->selling_price,
+                    'cost_price' => $product->cost_price,
+                    'subtotal'   => (float) $product->selling_price * $item['qty'],
                 ]);
  
                 if ($product->recipe && $product->recipe->items->isNotEmpty()) {
@@ -80,13 +97,14 @@ class SaleApiController extends Controller
                     $product->decrement('stock', $item['qty']);
                 }
             }
- 
+
             DB::commit();
             return response()->json([
-                'success' => true,
-                'message' => 'Pembayaran berhasil!',
-                'sale'    => $sale,
-                'change'  => round($change, 2),
+                'success'    => true,
+                'message'    => 'Pembayaran berhasil!',
+                'sale'       => $sale,
+                'invoice_no' => $sale->invoice_no,
+                'change'     => round($change, 2),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

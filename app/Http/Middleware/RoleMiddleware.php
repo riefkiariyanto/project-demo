@@ -19,8 +19,6 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        $userRole = strtolower(trim(auth()->user()->role));
-
         if (!$request->user()->hasRole($roles)) {
             abort(403);
         }

@@ -14,6 +14,7 @@ class Expense extends Model
         'user_id',
         'category',
         'description',
+        'material_id',
         'amount',
         'expense_date',
     ];
@@ -31,5 +32,10 @@ class Expense extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class);
     }
 }

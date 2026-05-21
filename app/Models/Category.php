@@ -11,11 +11,16 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'slug',
+        'store_id',
     ];
 
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 }

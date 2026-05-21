@@ -13,7 +13,7 @@ export default function SearchBar({ onSearch }) {
     };
 
     return (
-        <div className="bg-white/30 backdrop-blur-xl rounded-2xl p-1 border border-white/30 flex items-center">
+        <div className="bg-white/30 dark:bg-white/10 backdrop-blur-xl rounded-2xl p-1 border border-white/30 dark:border-white/10 flex items-center">
 
             {/* INPUT */}
             <input
@@ -47,6 +47,8 @@ export default function SearchBar({ onSearch }) {
                 className="
                     bg-orange-500
                     hover:bg-orange-600
+                    dark:bg-orange-600
+                    dark:hover:bg-orange-700
                     transition
                     text-white
                     p-2

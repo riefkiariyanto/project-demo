@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\MaterialApiController;
 use App\Http\Controllers\Api\SaleApiController;
 use App\Http\Controllers\Api\LaporanApiController;
 use App\Http\Controllers\Api\CategoryApiController;
+use App\Http\Controllers\Api\UserApiController;
 
 // ── Public routes ────────────────────────────────────────
 Route::post('/login', [AuthController::class, 'login']);
@@ -40,7 +41,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/categories', [CategoryApiController::class, 'index']);
 
     // Users (superadmin only)
-    Route::get('/users', [UserApiController::class, 'index']);
-    Route::post('/users', [UserApiController::class, 'store']);
-    Route::put('/users/{user}', [UserApiController::class, 'update']);
+    Route::middleware('role:superadmin')->group(function () {
+        Route::get('/users', [UserApiController::class, 'index']);
+        Route::post('/users', [UserApiController::class, 'store']);
+        Route::put('/users/{user}', [UserApiController::class, 'update']);
+    });
 });

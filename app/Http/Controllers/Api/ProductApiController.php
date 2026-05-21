@@ -48,6 +48,11 @@ class ProductApiController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $user = $request->user();
+        if (!$user->hasRole('superadmin') && $product->store_id !== $user->store_id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
             'category_id'   => 'required|exists:categories,id',
@@ -66,8 +71,13 @@ class ProductApiController extends Controller
         return response()->json($product);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
+        $user = $request->user();
+        if (!$user->hasRole('superadmin') && $product->store_id !== $user->store_id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $product->delete();
         return response()->json(['message' => 'Deleted']);
     }

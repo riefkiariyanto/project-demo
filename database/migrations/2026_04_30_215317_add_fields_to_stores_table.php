@@ -12,11 +12,21 @@ return new class extends Migration
     public function up()
 {
     Schema::table('stores', function (Blueprint $table) {
-        $table->string('name')->after('id');
-        $table->string('code')->nullable()->after('name');
-        $table->string('address')->nullable()->after('code');
-        $table->string('phone')->nullable()->after('address');
-        $table->boolean('is_active')->default(true)->after('phone');
+        if (!Schema::hasColumn('stores', 'name')) {
+            $table->string('name')->after('id');
+        }
+        if (!Schema::hasColumn('stores', 'code')) {
+            $table->string('code')->nullable()->after('name');
+        }
+        if (!Schema::hasColumn('stores', 'address')) {
+            $table->string('address')->nullable()->after('code');
+        }
+        if (!Schema::hasColumn('stores', 'phone')) {
+            $table->string('phone')->nullable()->after('address');
+        }
+        if (!Schema::hasColumn('stores', 'is_active')) {
+            $table->boolean('is_active')->default(true)->after('phone');
+        }
     });
 }
 

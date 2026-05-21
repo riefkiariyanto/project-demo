@@ -12,7 +12,6 @@ return new class extends Migration
    public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        // 🔥 Tambahkan pengecekan sebelum add column
         if (!Schema::hasColumn('users', 'store_id')) {
             $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
         }

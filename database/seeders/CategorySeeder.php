@@ -10,9 +10,11 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Coffee'],
+            ['name' => 'Kopi Susu'],
             ['name' => 'Non Coffee'],
-            ['name' => 'Tea'],
+            ['name' => 'Refreshment'],
+            ['name' => 'Espresso Based'],
+            ['name' => 'Manual Brew'],
             ['name' => 'Snack'],
             ['name' => 'Dessert'],
             ['name' => 'Food'],

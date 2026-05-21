@@ -4,12 +4,16 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import { Head, Link, useForm } from "@inertiajs/react";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { User, Mail, Lock } from "lucide-react";
 import { useState } from "react";
 
 export default function Register() {
 =======
 import { User, Mail, Lock, Store, KeyRound } from "lucide-react";
+=======
+import { UserIcon, EnvelopeIcon, LockClosedIcon, BuildingStorefrontIcon, KeyIcon } from "@heroicons/react/24/outline";
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
 import { useState } from "react";
 
 export default function Register() {
@@ -58,6 +62,21 @@ export default function Register() {
     return (
         <>
             <Head title="Register" />
+            <div className="absolute inset-0 overflow-hidden">
+
+    <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-400/20 rounded-full blur-3xl animate-pulse"></div>
+
+    <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-500/20 rounded-full blur-3xl animate-pulse"></div>
+
+    <div className="absolute inset-0 opacity-[0.05]"
+        style={{
+            backgroundImage:
+                "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+        }}
+    ></div>
+
+</div>
 
             <div className="
 <<<<<<< HEAD
@@ -69,12 +88,14 @@ export default function Register() {
 
 =======
                 min-h-screen flex items-center justify-center
-                bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950
+                bg-black overflow-hidden relative
                 px-4
             ">
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                 <div className="
+                    relative z-10
                     w-full max-w-md
+<<<<<<< HEAD
                     bg-white/5 backdrop-blur-xl
                     border border-white/10
 <<<<<<< HEAD
@@ -100,6 +121,10 @@ export default function Register() {
                         <div>
                             <InputLabel value="Name" />
 =======
+=======
+                    bg-white/10 backdrop-blur-xl
+                    border border-orange-400/10
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                     rounded-2xl p-6 sm:p-8 shadow-xl
                 ">
                     {/* HEADER */}
@@ -115,16 +140,16 @@ export default function Register() {
                     </div>
 
                     {/* TOGGLE MODE */}
-                    <div className="flex rounded-xl bg-white/5 border border-white/10 p-1 mb-6">
+                    <div className="flex rounded-xl bg-white/10 border border-orange-400/10 p-1 mb-6">
                         <button
                             type="button"
                             onClick={() => switchMode("store")}
                             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all
                                 ${mode === "store"
-                                    ? "bg-indigo-600 text-white"
+                                    ? "bg-orange-600 text-white"
                                     : "text-gray-400 hover:text-white"}`}
                         >
-                            <Store className="w-4 h-4" />
+                            <BuildingStorefrontIcon className="w-4 h-4" />
                             Daftar Toko
                         </button>
                         <button
@@ -132,10 +157,10 @@ export default function Register() {
                             onClick={() => switchMode("user")}
                             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all
                                 ${mode === "user"
-                                    ? "bg-indigo-600 text-white"
+                                    ? "bg-orange-600 text-white"
                                     : "text-gray-400 hover:text-white"}`}
                         >
-                            <KeyRound className="w-4 h-4" />
+                            <KeyIcon className="w-4 h-4" />
                             Punya Kode
                         </button>
                     </div>
@@ -149,12 +174,12 @@ export default function Register() {
                                 <div>
                                     <InputLabel value="Nama Toko" />
                                     <div className="relative mt-1">
-                                        <Store className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                        <BuildingStorefrontIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                         <TextInput
                                             type="text"
                                             value={data.store_name}
                                             placeholder="Contoh: Warkop Bahagia"
-                                            className="w-full pl-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                            className="w-full pl-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
                                             onChange={(e) => setData("store_name", e.target.value)}
                                             required
                                         />
@@ -169,7 +194,7 @@ export default function Register() {
                                             type="text"
                                             value={data.store_address}
                                             placeholder="Alamat toko"
-                                            className="w-full px-4 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                            className="w-full px-4 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
                                             onChange={(e) => setData("store_address", e.target.value)}
                                         />
                                     </div>
@@ -183,12 +208,12 @@ export default function Register() {
                             <div>
                                 <InputLabel value="Kode Toko" />
                                 <div className="relative mt-1">
-                                    <KeyRound className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                    <KeyIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                     <TextInput
                                         type="text"
                                         value={data.invite_code}
                                         placeholder="Masukkan kode toko (contoh: AB12CD34)"
-                                        className="w-full pl-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase"
+                                        className="w-full pl-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500 uppercase"
                                         onChange={(e) => setData("invite_code", e.target.value.toUpperCase())}
                                         required
                                     />
@@ -202,7 +227,7 @@ export default function Register() {
                             <InputLabel value="Nama Lengkap" />
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                             <div className="relative mt-1">
-                                <User className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type="text"
                                     value={data.name}
@@ -213,7 +238,7 @@ export default function Register() {
                                     }
 =======
                                     placeholder="Nama kamu"
-                                    className="w-full pl-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
                                     onChange={(e) => setData("name", e.target.value)}
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                                     required
@@ -226,7 +251,7 @@ export default function Register() {
                         <div>
                             <InputLabel value="Email" />
                             <div className="relative mt-1">
-                                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type="email"
                                     value={data.email}
@@ -237,7 +262,7 @@ export default function Register() {
                                     }
 =======
                                     placeholder="email@kamu.com"
-                                    className="w-full pl-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full pl-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
                                     onChange={(e) => setData("email", e.target.value)}
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                                     required
@@ -250,10 +275,11 @@ export default function Register() {
                         <div>
                             <InputLabel value="Password" />
                             <div className="relative mt-1">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type={showPassword ? "text" : "password"}
                                     value={data.password}
+<<<<<<< HEAD
                                     className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
 <<<<<<< HEAD
                                     onChange={(e) =>
@@ -268,6 +294,9 @@ export default function Register() {
                                     className="absolute right-3 top-3 text-gray-400"
                                 >
 =======
+=======
+                                    className="w-full pl-10 pr-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                                     onChange={(e) => setData("password", e.target.value)}
                                     required
                                 />
@@ -288,10 +317,11 @@ export default function Register() {
                             <InputLabel value="Konfirmasi Password" />
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                             <div className="relative mt-1">
-                                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
+                                <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
                                 <TextInput
                                     type={showConfirm ? "text" : "password"}
                                     value={data.password_confirmation}
+<<<<<<< HEAD
                                     className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500"
 <<<<<<< HEAD
                                     onChange={(e) =>
@@ -313,6 +343,9 @@ export default function Register() {
                                 className="mt-1"
                             />
 =======
+=======
+                                    className="w-full pl-10 pr-10 py-2.5 bg-white/10 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                                     onChange={(e) => setData("password_confirmation", e.target.value)}
                                     required
                                 />
@@ -328,6 +361,7 @@ export default function Register() {
                         {/* BUTTON */}
                         <PrimaryButton
 <<<<<<< HEAD
+<<<<<<< HEAD
                             className="
                                 w-full justify-center
                                 bg-indigo-600 hover:bg-indigo-700
@@ -339,6 +373,9 @@ export default function Register() {
                             Register
 =======
                             className="w-full justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg"
+=======
+                            className="w-full justify-center bg-gradient-to-r from-orange-400 to-orange-500 hover:scale-[1.02] text-white font-semibold py-2.5 rounded-lg"
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                             disabled={processing}
                         >
                             {processing
@@ -346,11 +383,24 @@ export default function Register() {
                                 : mode === "store" ? "Buat Toko & Daftar" : "Gabung Toko"}
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
                         </PrimaryButton>
+
+                        <div className="text-center mb-8">
+
+    <h1 className="text-5xl font-black text-white tracking-widest">
+        WERP
+    </h1>
+
+    <p className="mt-3 text-white/60">
+        Mempermudah pencacatan dan laporan UMKM mu
+    </p>
+
+</div>
                     </form>
 
                     {/* LOGIN LINK */}
                     <div className="mt-6 text-center text-sm text-gray-400">
                         Sudah punya akun?{" "}
+<<<<<<< HEAD
 <<<<<<< HEAD
                         <Link
                             href={route("login")}
@@ -359,6 +409,9 @@ export default function Register() {
 =======
                         <Link href={route("login")} className="text-indigo-400 font-semibold">
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
+=======
+                        <Link href={route("login")} className="text-orange-400 font-semibold">
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab
                             Login
                         </Link>
                     </div>

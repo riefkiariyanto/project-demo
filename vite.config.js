@@ -35,7 +35,25 @@ export default defineConfig({
         react(),
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
 });
 =======
 });
 >>>>>>> 49979cee001e869504cc1e09c0091dd308ddb19d
+=======
+
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'react-vendor': ['react', 'react-dom'],
+                    'inertia-vendor': ['@inertiajs/react'],
+                    'recharts-vendor': ['recharts'],
+                    'framer-vendor': ['framer-motion'],
+                },
+            },
+        },
+        chunkSizeWarningLimit: 600,
+    },
+});
+>>>>>>> 0151fbfc670c72da9535374da1cc993b038a6eab

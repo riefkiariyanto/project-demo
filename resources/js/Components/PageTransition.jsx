@@ -10,6 +10,7 @@ export default function PageTransition({ children, keyProp }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
+                style={{ height: '100%', minHeight: 0 }}
             >
                 {children}
             </motion.div>

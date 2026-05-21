@@ -22,8 +22,6 @@ class DatabaseSeeder extends Seeder
 }
 =======
             CategorySeeder::class,
-            MaterialSeeder::class,
-            ProductSeeder::class,
         ]);
     }
 }
