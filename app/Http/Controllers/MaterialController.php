@@ -89,13 +89,15 @@ class MaterialController extends Controller
         $bahan->stock += $request->qty;
         $bahan->save();
 
+        $hargaUnit = $bahan->buy_price / max((float) $bahan->initial_qty, 1);
+
         Expense::create([
             'store_id'     => $bahan->store_id,
             'user_id'      => auth()->id(),
             'category'     => 'Belanja Bahan',
             'description'  => $bahan->name,
             'material_id'  => $bahan->id,
-            'amount'       => $bahan->buy_price * $request->qty,
+            'amount'       => $hargaUnit * $request->qty,
             'expense_date' => now()->toDateString(),
         ]);
     } else {
