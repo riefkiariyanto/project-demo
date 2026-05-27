@@ -5,51 +5,79 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
+            'device_name' => 'nullable|string|max:255',
         ]);
 
-        $user = User::with('roles')->where('email', $request->email)->first();
+        $throttleKey = Str::lower($validated['email']).'|'.$request->ip();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Email atau password salah'], 401);
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            throw ValidationException::withMessages([
+                'email' => ["Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik."],
+            ]);
         }
 
-        $token = $user->createToken('flutter-app')->plainTextToken;
+        $user = User::with(['roles', 'store'])->where('email', $validated['email'])->first();
 
-        return response()->json([
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
+
+            return $this->errorResponse('Email atau password salah.', 401);
+        }
+
+        if ($user->getAttribute('is_active') === false) {
+            return $this->errorResponse('Akun Anda tidak aktif.', 403);
+        }
+
+        RateLimiter::clear($throttleKey);
+
+        $tokenName = $validated['device_name'] ?? 'flutter-app';
+        $token = $user->createToken($tokenName)->plainTextToken;
+
+        return $this->successResponse([
             'token' => $token,
+            'token_type' => 'Bearer',
             'user'  => [
                 'id'       => $user->id,
                 'name'     => $user->name,
                 'email'    => $user->email,
                 'store_id' => $user->store_id,
-                'roles'    => $user->roles->pluck('name'),
+                'store'    => $user->store,
+                'roles'    => $user->roles->pluck('name')->values(),
             ],
-        ]);
+        ], 'Login berhasil.');
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        $request->user()->currentAccessToken()?->delete();
+
+        return $this->successResponse(null, 'Logout berhasil.');
     }
 
     public function me(Request $request)
     {
-        $user = $request->user()->load('roles');
-        return response()->json([
+        $user = $request->user()->load(['roles', 'store']);
+
+        return $this->successResponse([
             'id'       => $user->id,
             'name'     => $user->name,
             'email'    => $user->email,
             'store_id' => $user->store_id,
-            'roles'    => $user->roles->pluck('name'),
-        ]);
+            'store'    => $user->store,
+            'roles'    => $user->roles->pluck('name')->values(),
+        ], 'Profil pengguna berhasil diambil.');
     }
 }

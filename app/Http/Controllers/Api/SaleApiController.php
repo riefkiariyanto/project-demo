@@ -5,11 +5,13 @@
 namespace App\Http\Controllers\Api;
  
 use App\Http\Controllers\Controller;
+use App\Models\Material;
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
  
 class SaleApiController extends Controller
 {
@@ -23,92 +25,163 @@ class SaleApiController extends Controller
             'paid_amount'            => 'required|numeric|min:0',
         ]);
 
-        DB::beginTransaction();
         try {
-            $user       = $request->user();
-            $paidAmount = (float) $validated['paid_amount'];
+            $payload = DB::transaction(function () use ($request, $validated) {
+                $user = $request->user();
+                $paidAmount = (float) $validated['paid_amount'];
 
-            // Load all products server-side to compute authoritative subtotal
-            $productIds = array_column($validated['items'], 'product_id');
-            $products   = Product::with('recipe.items.material')
-                ->whereIn('id', $productIds)
-                ->where('store_id', $user->store_id)
-                ->get()
-                ->keyBy('id');
+                $items = collect($validated['items'])
+                    ->groupBy('product_id')
+                    ->map(fn($rows, $productId) => [
+                        'product_id' => (int) $productId,
+                        'qty' => (int) $rows->sum('qty'),
+                    ])
+                    ->values();
 
-            foreach ($validated['items'] as $item) {
-                if (!$products->has($item['product_id'])) {
-                    return response()->json(['success' => false, 'message' => 'Produk tidak ditemukan di toko ini'], 422);
+                $productIds = $items->pluck('product_id')->all();
+
+                $products = Product::with('recipe.items.material')
+                    ->whereIn('id', $productIds)
+                    ->where('store_id', $user->store_id)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                foreach ($items as $item) {
+                    if (!$products->has($item['product_id'])) {
+                        throw ValidationException::withMessages([
+                            'items' => ['Produk tidak ditemukan di toko ini.'],
+                        ]);
+                    }
                 }
-            }
 
-            $subtotal = 0;
-            foreach ($validated['items'] as $item) {
-                $subtotal += (float) $products[$item['product_id']]->selling_price * $item['qty'];
-            }
+                $subtotal = 0;
+                foreach ($items as $item) {
+                    $subtotal += (float) $products[$item['product_id']]->selling_price * $item['qty'];
+                }
 
-            $change = $paidAmount - $subtotal;
+                $change = $paidAmount - $subtotal;
 
-            if ($paidAmount < $subtotal) {
-                return response()->json(['success' => false, 'message' => 'Nominal pembayaran kurang!'], 422);
-            }
+                if ($paidAmount < $subtotal) {
+                    throw ValidationException::withMessages([
+                        'paid_amount' => ['Nominal pembayaran kurang!'],
+                    ]);
+                }
 
-            $sale = Sale::create([
-                'invoice_no'     => $this->generateInvoiceNo(),
-                'store_id'       => $user->store_id,
-                'user_id'        => $user->id,
-                'subtotal'       => $subtotal,
-                'discount'       => 0,
-                'tax'            => 0,
-                'grand_total'    => $subtotal,
-                'payment_method' => $validated['payment_method'],
-                'paid_amount'    => $paidAmount,
-                'change_amount'  => $change,
-                'status'         => 'completed',
-                'sale_date'      => now(),
-            ]);
+                $materialUsage = [];
+                $productUsage = [];
 
-            foreach ($validated['items'] as $item) {
-                $product = $products[$item['product_id']];
+                foreach ($items as $item) {
+                    $product = $products[$item['product_id']];
 
-                SaleItem::create([
-                    'sale_id'    => $sale->id,
-                    'product_id' => $item['product_id'],
-                    'qty'        => $item['qty'],
-                    'price'      => $product->selling_price,
-                    'cost_price' => $product->cost_price,
-                    'subtotal'   => (float) $product->selling_price * $item['qty'],
-                ]);
- 
-                if ($product->recipe && $product->recipe->items->isNotEmpty()) {
-                    foreach ($product->recipe->items as $recipeItem) {
-                        $material = $recipeItem->material;
-                        if (!$material) continue;
-                        $usedQty = $recipeItem->qty * $item['qty'];
-                        if ($material->stock < $usedQty) {
-                            throw new \Exception("Stok bahan {$material->name} tidak cukup");
+                    if ($product->recipe && $product->recipe->items->isNotEmpty()) {
+                        foreach ($product->recipe->items as $recipeItem) {
+                            if (!$recipeItem->material_id) {
+                                continue;
+                            }
+
+                            $materialUsage[$recipeItem->material_id] = ($materialUsage[$recipeItem->material_id] ?? 0)
+                                + ($recipeItem->qty * $item['qty']);
                         }
-                        $material->decrement('stock', $usedQty);
-                    }
-                } else {
-                    if ($product->stock < $item['qty']) {
-                        throw new \Exception("Stok produk {$product->name} tidak cukup");
-                    }
-                    $product->decrement('stock', $item['qty']);
-                }
-            }
 
-            DB::commit();
-            return response()->json([
-                'success'    => true,
-                'message'    => 'Pembayaran berhasil!',
-                'sale'       => $sale,
-                'invoice_no' => $sale->invoice_no,
-                'change'     => round($change, 2),
-            ]);
+                        continue;
+                    }
+
+                    $productUsage[$product->id] = ($productUsage[$product->id] ?? 0) + $item['qty'];
+                }
+
+                $materials = Material::whereIn('id', array_keys($materialUsage))
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                foreach ($materialUsage as $materialId => $usedQty) {
+                    $material = $materials->get($materialId);
+
+                    if (!$material || $material->stock < $usedQty) {
+                        throw ValidationException::withMessages([
+                            'items' => ['Stok bahan tidak cukup.'],
+                        ]);
+                    }
+                }
+
+                foreach ($productUsage as $productId => $usedQty) {
+                    $product = $products[$productId];
+
+                    if ($product->stock < $usedQty) {
+                        throw ValidationException::withMessages([
+                            'items' => ["Stok produk {$product->name} tidak cukup."],
+                        ]);
+                    }
+                }
+
+                $sale = Sale::create([
+                    'invoice_no' => $this->generateInvoiceNo(),
+                    'store_id' => $user->store_id,
+                    'user_id' => $user->id,
+                    'subtotal' => $subtotal,
+                    'discount' => 0,
+                    'tax' => 0,
+                    'grand_total' => $subtotal,
+                    'payment_method' => $validated['payment_method'],
+                    'paid_amount' => $paidAmount,
+                    'change_amount' => $change,
+                    'status' => 'completed',
+                    'sale_date' => now(),
+                ]);
+
+                foreach ($items as $item) {
+                    $product = $products[$item['product_id']];
+
+                    if ($product->recipe && $product->recipe->items->isNotEmpty()) {
+                        $costPrice = $product->recipe->items->sum(function ($recipeItem) use ($materials) {
+                            $material = $materials->get($recipeItem->material_id);
+
+                            if (!$material || $material->initial_qty <= 0) {
+                                return 0;
+                            }
+
+                            return ($material->buy_price / $material->initial_qty) * $recipeItem->qty;
+                        });
+                    } else {
+                        $costPrice = (float) $product->cost_price;
+                    }
+
+                    SaleItem::create([
+                        'sale_id' => $sale->id,
+                        'product_id' => $item['product_id'],
+                        'qty' => $item['qty'],
+                        'price' => $product->selling_price,
+                        'cost_price' => $costPrice,
+                        'subtotal' => (float) $product->selling_price * $item['qty'],
+                    ]);
+                }
+
+                foreach ($materialUsage as $materialId => $usedQty) {
+                    $materials[$materialId]->decrement('stock', $usedQty);
+                }
+
+                foreach ($productUsage as $productId => $usedQty) {
+                    $products[$productId]->decrement('stock', $usedQty);
+                }
+
+                return $this->successResponse([
+                    'sale' => $sale->fresh()->load('items.product:id,name'),
+                    'invoice_no' => $sale->invoice_no,
+                    'change' => round($change, 2),
+                ], 'Pembayaran berhasil!', 201);
+            });
+
+            return $payload;
+        } catch (ValidationException $e) {
+            return $this->errorResponse('Validasi gagal.', 422, $e->errors());
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            report($e);
+
+            return $this->errorResponse(
+                config('app.debug') ? $e->getMessage() : 'Pembayaran gagal diproses.',
+                500
+            );
         }
     }
  
